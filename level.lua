@@ -76,14 +76,15 @@ function Level:calcMagnetField()
 		magnet.edges = self:calcMagnetEdgePos(magnet)
 		for point in magnet.edges do
     		for x=1,self.grid_width do
-    		  local line = {}
+    		  --local line = {}
     		  for y=1,self.grid_height do
     		      local fieldStrength = self:calcFieldStrengthAtPoint(magnet.fieldStrength, point, x, y)
     		      local fieldDir = self:calcFieldDirection(point, x, y)
     		      local fieldVec = fieldStrength*fieldDir
-    		      line[y] = Vector.new(0.5, 0.5)
+    		      --line[y] = Vector(0.5, 0.5)
+    		      self.field_raster[x].line[y] = self.field_raster[x].line[y] + fieldVec
     		  end
-    		  self.field_raster[x] = line
+    		  --self.field_raster[x] = line
     		end
     	end
     end
