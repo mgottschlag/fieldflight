@@ -6,6 +6,9 @@ require "utility"
 
 local magnet_img = love.graphics.newImage("graphics/Magnet-Test.png")
 
+
+
+
 Level = Class(function(self)
 end)
 
@@ -18,6 +21,7 @@ function Level:load(filename)
 	self:loadFromFile(filename)
 
 	--Initialize Magnets
+
 
 
 	-- We sample the field strength every x pixels
@@ -149,6 +153,9 @@ function Level:draw(level_offset, scissor_top_left, scissor_size)
 end
 
 function Level:drawFieldVectors(level_offset, scissor_top_left, scissor_size, position, radius)
+	love.graphics.polygon('fill', 	 50, 1,											--top point
+					19, 13,  4, 37,  1, 54,  2, 91,  9, 110,  30, 133,  14, 145,  6, 162, 9, 281, 		--left side 
+					89, 281,  92, 162,  85, 145,  68, 133,  89, 110,  97, 91,  98, 54,  95, 37,  80, 13) 	--right side
 	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.setLine(1, "smooth")
 	love.graphics.setScissor(scissor_top_left.x, scissor_top_left.y,

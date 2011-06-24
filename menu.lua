@@ -6,11 +6,13 @@ require "game"
 require "settings_menu"
 require "singleplayer_menu"
 
+
 menu = Gamestate.new()
 
 main_buttons = {}
 
 function menu:init()
+
 	local center_x = love.graphics.getWidth() / 2
 	local center_y = love.graphics.getHeight() / 2
 	local font_size = 15
@@ -64,7 +66,7 @@ function menu:update(dt)
 end
 
 function menu:draw()
-	goo:draw(dt)
+	goo:draw()
 end
 
 function menu:keypressed(key, unicode)

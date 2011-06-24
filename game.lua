@@ -1,4 +1,5 @@
 require "anal/AnAL"
+require "tesound/TEsound"
 
 Gamestate = require "hump.gamestate"
 
@@ -6,6 +7,9 @@ require "level"
 
 game = Gamestate.new()
 local numberOfPlayers = 1
+
+
+
 
 function game:init()
 end
@@ -16,10 +20,13 @@ function game:enter(previous, filename)
 	if not game.level.load(filename) then
 		-- TODO: Switch back to the menu and pass an error
 	end
-	-- Initialize player
+	-- Initialize players
+	
+	--initilize sound
+	source = love.audio.newSource( "sound/main.wav" , "stream" )
+	--TODO tesound
+	
 	-- TODO
-
-	--Initialize joystick settings
 
 	--Initialize Plane
 	local plane_img = love.graphics.newImage("plane.png")
@@ -32,6 +39,7 @@ function game:update(dt)
 	--Let the players check the input sources
 	for i = 1, numberOfPlayers do
 		self["player"..i]:checkInput()
+		self["player"..i].spaceship:update()
 	end
 	
 end
