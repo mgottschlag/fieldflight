@@ -35,7 +35,9 @@ function Level:load(filename)
 		end
 		self.field_raster[x] = line
 	end
-
+	
+	self:calcMagnetField()
+	
 	return false
 end
 
