@@ -1,0 +1,49 @@
+
+ Spielidee:
+===========
+
+Ein magnetisches Raumschiff (rechte hälfte Nordpol, linke Südpol - oder anders 
+rum) fliegt durch
+eine Rennstrecke voller Stab- und anderen Magneten. Wird dann auch realistisch
+im Magnetfeld bewegt, Kollisionen mit einem Objekt führen zu Zerstörung des
+Raumschiffes und zu [Zurücksetzung auf einen früheren Streckenpunkt] Alternative:
+Leben--.
+
+Ziel: Die Strecke unbeschadet und möglichst schnell zu durchlaufen.
+
+Steuerung: links/rechts drehen, hoch beschleunigen. Gamecontroller? auf jeden Fall!jo is cool
+---> Steuerung dann nur rechts/links? und was ist dann das ziel? <= schreibt doch dahin wo es hingehört
+
+Multiplayer: Zwei Spieler (Splitscreen), möglicherweise Powerups, die die Polung
+des anderen Spielers zeitweise umdrehen.<-- beide spielen gelichzeitig??? Splitscreen, ja. kann das nicht auch in einen screen, also einer oben und einer unten?
+
+ Grafik:
+=========
+
+Hintergrund: Sternenfeld? (unwichtig => am schluss)
+Wichtig: Visualisierung des Magnetfelds (durch Feldlinien? Anzeige der
+Feldlinienrichtung in einem Bereich um das Raumschiff?)
+
+
+Physik:
+==========
+sehr einfach - also nix mit love.physik
+
+Wir müssen Magnetfelder simulieren und Feldlinien zeichnen, v.a. letzteres wird kompliziert.tatsache
+
+nein, das ganze muss eine eigene physik engine werden, die möglichst sich 
+auch an physikalische gesetze hält
+
+ Programmteile:
+================
+
+- Menü
+	- Singleplayer
+		- Levelauswahl, Schwierigkeit
+	- Multiplayer
+		-Levelauswahl, Schwierigkeitsgrad, Spieleranzahl(???) <-- Wenn es nen Schwierigkeitsgrad gibt, brauchen wir keine Levelauswahl
+	- Einstellungen
+    	- Farben, Spielernamen
+- Track (Physik, Darstellung der Magneten etc.)
+- Spiel (Zeichnen des Raumschiffes/der Raumschiffe, Bewegung, etc)
+
