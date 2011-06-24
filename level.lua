@@ -31,7 +31,7 @@ function Level:load(filename)
 		local line = {}
 		for y=1,self.grid_height do
 			-- Initialize the array with zero field strength
-			line[y] = Vector.new(0.5, 0.5)
+			line[y] = Vector.new(0, 0)
 		end
 		self.field_raster[x] = line
 	end
@@ -73,20 +73,21 @@ end
 
 function Level:calcMagnetField()
 	-- Add influence of all magnets to the field strength grid
-	for magnet in self.magnets do
+	for _,magnet in pairs(self.magnets) do
 		--The Edgepositions of the Magnet in Rasterunits
 		magnet.edges = self:calcMagnetEdgePos(magnet)
-		for point in magnet.edges do
+		for _,point in pairs(magnet.edges) do
     		for x=1,self.grid_width do
-    		  --local line = {}
+    		  local line = self.field_raster[x]
     		  for y=1,self.grid_height do
     		      local fieldStrength = self:calcFieldStrengthAtPoint(magnet.fieldStrength, point, x, y)
     		      local fieldDir = self:calcFieldDirection(point, x, y)
     		      local fieldVec = fieldStrength*fieldDir
     		      --line[y] = Vector(0.5, 0.5)
-    		      self.field_raster[x].line[y] = self.field_raster[x].line[y] + fieldVec
+    		      --print(self.field_raster[x]
+    		      line[y] = line[y] + fieldVec
     		  end
-    		  --self.field_raster[x] = line
+    		  self.field_raster[x] = line
     		end
     	end
     end
@@ -95,13 +96,16 @@ end
 function Level:calcMagnetEdgePos(magnet)
     edgeX = {}
 	--The first Edge (north)
+	edgeX[1] = {}
 	local x1 = (magnet.pos_x - math.sin(magnet.rot)*magnet.length) / self.grid_cell_width
-	local y1 = (magnet.pos_y - math.cos(magnet.rot)*magnet.length) / self.grid_cell_width
+	local y1 = ((magnet.pos_y+magnet.width/2) - math.cos(magnet.rot)*magnet.length) / self.grid_cell_width
 	edgeX[1].point = Vector.new(x1, y1)
+	love.graphics.print(x1 .. " " .. y1, 300, 100)
 	edgeX[1].pole = -1
 	--The second Edge (south)
+	edgeX[2] = {}
 	local x1 = (magnet.pos_x + math.sin(magnet.rot)*magnet.length) / self.grid_cell_width
-	local y1 = (magnet.pos_y + math.cos(magnet.rot)*magnet.length) / self.grid_cell_width
+	local y1 = ((magnet.pos_y + magnet.width/2) + math.cos(magnet.rot)*magnet.length) / self.grid_cell_width
 	edgeX[2].point = Vector.new(x2, y2)
 	edgeX[2].pole = 1
 	return edgeX
@@ -181,7 +185,7 @@ end
 
 function Level:drawFieldVector(level_offset, position)
 	local arrow_start = level_offset + position
-	local grid_position = vec_round(position / self.grid_cell_width)
+	local grid_position = vec_floor(position / self.grid_cell_width + vector(0.9, 0.9))
 	-- Main arrow line
 	local field_strength = self.field_raster[grid_position.x][grid_position.y]
 	field_strength = field_strength * self.grid_cell_width
