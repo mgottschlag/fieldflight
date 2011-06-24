@@ -4,10 +4,16 @@ Gamestate = require "hump.gamestate"
 game = Gamestate.new()
 
 function game:init()
-	-- TODO: Initialize gui
 end
 
 function game:enter(previous)
+	-- Load level
+	game.level = Level:new()
+	if not game.load("test") then
+		-- TODO: Create an error
+	end
+	-- TODO
+	-- Initialize player
 	-- TODO
 end
 
