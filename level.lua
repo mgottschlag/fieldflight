@@ -71,7 +71,7 @@ end
 
 function Level:calcMagnetField()
 	-- Add influence of all magnets to the field strength grid
-	for magnet self.magnets do
+	for magnet in self.magnets do
 		--The Edgepositions of the Magnet in Rasterunits
 		magnet.edges = self:calcMagnetEdgePos(magnet)
 		-- v1, v2 = self:calcMagnetEdgePos(magnet)
