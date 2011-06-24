@@ -6,6 +6,14 @@ require "goo/goo"
 function love.load()
 	goo:load()
 	Gamestate.registerEvents()
+
+	-- Initialize Joysticks
+	numberOfJoysticks = love.joystick.getNumJoysticks()
+	joystickNames = {}
+	for i = 0, numberOfJoysticks do
+	  joystickNames[i] = love.joystick.getName(i)
+	end
+
 	-- At startup, just show the menu
 	-- TODO: Show some intro screen here
 	Gamestate.switch(menu)

@@ -3,45 +3,60 @@ Gamestate = require "hump.gamestate"
 goo = require "goo/goo"
 
 require "game"
+require "settings_menu"
+require "singleplayer_menu"
 
 menu = Gamestate.new()
 
+main_buttons = {}
 
 function menu:init()
-	-- TODO: Initialize gui
 	local center_x = love.graphics.getWidth() / 2
 	local center_y = love.graphics.getHeight() / 2
+	local font_size = 15
 	-- Singleplayer button
-	local sp_button = goo.button:new()
-	sp_button:setPos(center_x - 100, center_y - 100)
-	sp_button:setSize(200, 40)
-	sp_button:setText("Singleplayer")
-	sp_button.style.textFont = love.graphics.newFont(40)
+	main_buttons["singleplayer"] = goo.button:new()
+	main_buttons["singleplayer"]:setPos(center_x - 100, center_y - 100)
+	main_buttons["singleplayer"]:setText("Singleplayer")
+	main_buttons["singleplayer"].onClick = function(self, button)
+		Gamestate.switch(singleplayer_menu)
+	end
 	-- Multiplayer button
-	local mp_button = goo.button:new()
-	mp_button:setPos(center_x - 100, center_y - 50)
-	mp_button:setSize(200, 40)
-	mp_button:setText("Multiplayer")
-	sp_button.style.textFont = love.graphics.newFont(40)
+	main_buttons["multiplayer"] = goo.button:new()
+	main_buttons["multiplayer"]:setPos(center_x - 100, center_y - 50)
+	main_buttons["multiplayer"]:setText("Multiplayer")
 	-- Settings button
-	local settings_button = goo.button:new()
-	settings_button:setPos(center_x - 100, center_y)
-	settings_button:setSize(200, 40)
-	settings_button:setText("Settings")
-	sp_button.style.textFont = love.graphics.newFont(40)
+	main_buttons["settings"] = goo.button:new()
+	main_buttons["settings"]:setPos(center_x - 100, center_y)
+	main_buttons["settings"]:setText("Settings")
+	main_buttons["settings"].onClick = function(self, button)
+		Gamestate.switch(settings_menu)
+	end
 	-- Quit button
-	local quit_button = goo.button:new()
-	quit_button:setPos(center_x - 100, center_y + 50)
-	quit_button:setSize(200, 40)
-	quit_button:setText("Quit")
-	sp_button.style.textFont = love.graphics.newFont(40)
+	main_buttons["quit"] = goo.button:new()
+	main_buttons["quit"]:setPos(center_x - 100, center_y + 50)
+	main_buttons["quit"]:setText("Quit")
+	main_buttons["quit"].onClick = function(self, button)
+		-- TODO: Show credits?
+		love.event.push("q")
+	end
+	for k,v in pairs(main_buttons) do
+		v:setSize(200, 40)
+		v.style.textFont = love.graphics.newFont(font_size)
+		v:setVisible(false)
+	end
 end
 
 function menu:enter(previous)
-	-- TODO
+	for k,v in pairs(main_buttons) do
+		v:setVisible(true)
+	end
 end
 
 function menu:leave()
+	for k,v in pairs(main_buttons) do
+		v:setVisible(false)
+	end
 end
 
 function menu:update(dt)
@@ -65,4 +80,3 @@ end
 function menu:mousereleased(x,y, mouse_btn)
 	goo:mousereleased(x, y, mouse_btn)
 end
-

@@ -11,11 +11,15 @@ end
 function game:enter(previous, filename)
 	-- Load level
 	game.level = Level:new()
-	if not game.load(filename) then
+	if not game.level.load(filename) then
 		-- TODO: Switch back to the menu and pass an error
 	end
 	-- Initialize player
 	-- TODO
+
+	--Initialize joystick settings
+
+	--Initialize Plane
 end
 
 function game:update(dt)
@@ -33,4 +37,3 @@ end
 function game:mousereleased(x,y, mouse_btn)
 	-- TODO
 end
-
