@@ -1,7 +1,9 @@
 
+require "settings"
 require "menu"
 
 require "goo/goo"
+
 
 function love.load()
 	goo:load()
@@ -13,6 +15,10 @@ function love.load()
 	for i = 0, numberOfJoysticks do
 	  joystickNames[i] = love.joystick.getName(i)
 	end
+
+	-- load settings
+	setting = Settings()
+	setting:loadSettings("game_settings")
 
 	-- At startup, just show the menu
 	-- TODO: Show some intro screen here

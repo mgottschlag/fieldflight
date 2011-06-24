@@ -10,7 +10,7 @@ end
 
 function game:enter(previous, filename)
 	-- Load level
-	game.level = Level:new()
+	game.level = Level()
 	if not game.level.load(filename) then
 		-- TODO: Switch back to the menu and pass an error
 	end
@@ -23,7 +23,8 @@ function game:enter(previous, filename)
 end
 
 function game:update(dt)
-	-- TODO
+	dt = math.min(dt, tonumber(main.setting:getValue("framerate", "1/30")))
+	
 end
 
 function game:draw()
