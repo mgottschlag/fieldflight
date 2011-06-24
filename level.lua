@@ -35,21 +35,6 @@ function Level:load(filename)
 		end
 		self.field_raster[x] = line
 	end
-	-- Add influence of all magnets to the field strength grid
-	for _,magnet in pairs(self.magnets) do
-		--The Edgepositions of the Magnet in Rasterunits
-		--{x1, y1}{x2, y2} = self:calcMagnetEdgePos(magnet)
-		v1, v2 = self:calcMagnetEdgePos(magnet)
-		for x=1,self.grid_width do
-			local line = {}
-			for y=1,self.grid_height do
-				-- Initialize the array with zero field strength
-				
-				line[y] = Vector.new(0.5, 0.5)
-			end
-			self.field_raster[x] = line
-		end
-	end
 
 	return false
 end
@@ -84,14 +69,34 @@ function Level:loadFromFile(filename)
 	end
 end
 
+function Level:calcMagnetField()
+	-- Add influence of all magnets to the field strength grid
+	for magnet self.magnets do
+		--The Edgepositions of the Magnet in Rasterunits
+		magnet.edges = self:calcMagnetEdgePos(magnet)
+		-- v1, v2 = self:calcMagnetEdgePos(magnet)
+		for x=1,self.grid_width do
+			local line = {}
+			for y=1,self.grid_height do
+				
+				line[y] = Vector.new(0.5, 0.5)
+			end
+			self.field_raster[x] = line
+		end
+	end
+end
+
 function Level:calcMagnetEdgePos(magnet)
-	--The first Edge
-	local x1 = (magnet.pos_x - math.sin(magnet.rot)*magnet.length) / self.grid_cell_width
-	local y1 = (magnet.pos_y - math.cos(magnet.rot)*magnet.length) / self.grid_cell_width
-	--The second Edge
-	local x1 = (magnet.pos_x + math.sin(magnet.rot)*magnet.length) / self.grid_cell_width
-	local y1 = (magnet.pos_y + math.cos(magnet.rot)*magnet.length) / self.grid_cell_width
-	return {x1, y1}, {x2, y2}
+    local edge = {}
+	--The first Edge (north)
+	local x1 = (magnet.pos_x - math.sin(magnet.rot)*magnet.length)
+	local y1 = (magnet.pos_y - math.cos(magnet.rot)*magnet.length)
+	edge[1] = Vector.new(x1, y1)
+	--The second Edge (south)
+	local x1 = (magnet.pos_x + math.sin(magnet.rot)*magnet.length)
+	local y1 = (magnet.pos_y + math.cos(magnet.rot)*magnet.length)
+	edge[2] = Vector.new(x2, y2)
+	return edge
 end
 
 
