@@ -7,10 +7,9 @@ local setting = {
 	value=""
 }
 
-local list = {}
-local path = ""
-
 Settings = Class(function(self)
+	self.list = {}
+	self.path = ""
 end)
 
 function Settings:set(key, value)
@@ -31,7 +30,7 @@ function Settings:loadSettings( pathIn )
 			self:insertNewPair(pair[1], pair[2])	
 		end
 	else
-		love.filesystem.newFile(path)
+		love.filesystem.newFile(self.path)
 	end
 end 
 

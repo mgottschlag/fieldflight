@@ -1,29 +1,32 @@
 Class = require "hump.class"
-require "AnAL"
+require "anal/AnAL"
 vector = require "hump.vector"
 
 Spaceship = Class(function(self)
 end)
 
-local name = "I am a player!"
-local x = 0
-local y = 0
+-- constant
 local width = 200
 local height = 200
 local scale = 0.5
-local speed = 0
 local acceleration = 0.5
-local rotation = 0
+-- variable
 local v = vector(1,1)
+local rotation = 0
 local polarisation = 0
+local speed = 0
+local x = 0
+local y = 0
+
 local image
 local player
 local spaceship_animation
 local spaceship_polygon = {	50, 1,											--top point
 				19, 13,  4, 37,  1, 54,  2, 91,  9, 110,  30, 133,  14, 145,  6, 162, 9, 281, 		--left side 
-				89, 281,  92, 162,  85, 145,  68, 133,  89, 110,  97, 91,  98, 54,  95, 37,  80, 13) 	--right side}
+				89, 281,  92, 162,  85, 145,  68, 133,  89, 110,  97, 91,  98, 54,  95, 37,  80, 13} 	--right side}
 
 function countdown( player, img_path, x, y )
+	self:backToTheRoots()
 --TODO startrichtung muss von level abhängig sein
 	self.image = love.graphics.newImage(img_path)
 	self.player = player
@@ -33,11 +36,22 @@ function countdown( player, img_path, x, y )
 	-- newAnimation(plane_img, 200, 200, 0, 2)
 end
 
+function backToTheRoots()
+	local v = vector(1,1)
+	local rotation = 0
+	local speed = 0
+	local x = 0
+	local y = 0
+	self:invertPolarisation(1)
+end
+
 function update()
-	self.draw(
+	self:draw()
 end
 
 function draw()
+	updateVector()
+	calculatePosition()
 -- love.graphics.draw( drawable, x, y, orientation, scaleX, scaleY, originX, originY )
 	self.spaceship_animation:draw(self.spaceship_animation,
 		self.x, self.y,
@@ -58,17 +72,15 @@ function accelerate(dt)
 end
 
 function rotate(degree)
-	rotation = math.mod(rotation + degre
-local y = 0e, 360) --TODO testen! Doku fehlt
+	rotation = math.mod(rotation + degre/360) --TODO testen! Doku fehlt
 	love.graphics.push(self.spaceship_animation)
-	self.v:rotate_inplace((self.rotation/360) * math.pi)
 	love.graphics.rotate(rotation)
 	love.graphics.pop()
 end
 
 function updateVector()
 	self.v:rotate_inplace((self.rotation/360) * math.pi)
-	self-v = self.v:nom
+	self.v:normalize_inplace()
 	self.v = self.v * self.speed
 end
 
@@ -76,7 +88,11 @@ function getSpeed()
 	return self.speed
 end
 
-function invertPolarisation()
+function getPolarisation()
+	return self.polarisation
+end
+
+function invertPolarisation(polarisation)
 	self.polarisation = math.mod(polarisation + 1, 2) -- (polarisation +1)%2
 	self.spaceship_animation:seek(self.polarisation + 1)
 end
@@ -85,4 +101,8 @@ function scaleSpaceshipPolygon()
 	for x in self.spaceship_polygon do
 		x = x*self.scale
 	end
+end
+
+function rotateSpaceshipPolygon()
+  
 end

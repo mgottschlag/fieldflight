@@ -34,7 +34,7 @@ function singleplayer_menu:init()
 	singleplayer_menu_gui_elements["button_start"]:setSize(200, 50)
 	singleplayer_menu_gui_elements["button_start"]:setText("Start!")
 	singleplayer_menu_gui_elements["button_start"].onClick = function(self, button)
-		Gamestate.switch(game)
+		Gamestate.switch(game, "test.level")
 	end
 end
 
