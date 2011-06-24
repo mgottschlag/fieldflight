@@ -78,7 +78,7 @@ function Level:calcMagnetField()
 	for magnet in self.magnets do
 		--The Edgepositions of the Magnet in Rasterunits
 		magnet.edges = self:calcMagnetEdgePos(magnet)
-		for point in magnet.edges
+		for point in magnet.edges do
     		for x=1,self.grid_width do
     		  local line = {}
     		  for y=1,self.grid_height do
@@ -97,12 +97,12 @@ function Level:calcMagnetEdgePos(magnet)
 	local x1 = (magnet.pos_x - math.sin(magnet.rot)*magnet.length) / self.grid_cell_width
 	local y1 = (magnet.pos_y - math.cos(magnet.rot)*magnet.length) / self.grid_cell_width
 	edgeX[1].point = Vector.new(x1, y1)
-	edgeX[1].pole = 1
+	edgeX[1].pole = -1
 	--The second Edge (south)
 	local x1 = (magnet.pos_x + math.sin(magnet.rot)*magnet.length) / self.grid_cell_width
 	local y1 = (magnet.pos_y + math.cos(magnet.rot)*magnet.length) / self.grid_cell_width
 	edgeX[2].point = Vector.new(x2, y2)
-	edgeX[2].pole = -1
+	edgeX[2].pole = 1
 	return edgeX
 end
 
@@ -114,7 +114,7 @@ function Level:calcFieldStrengthAtPoint(fieldStrength, point, x, y)
 end
 
 function Level:calcFieldDirection(point, x, y)
-    local dir = vector.new()
+    local dir = vector.new(point.point.x-x, point.point.y-y)
 end
 
 function Level:getFieldVector(x, y)
