@@ -1,7 +1,10 @@
 
 require "menu"
 
+require "goo/goo"
+
 function love.load()
+	goo:load()
 	Gamestate.registerEvents()
 	-- At startup, just show the menu
 	-- TODO: Show some intro screen here

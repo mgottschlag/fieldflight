@@ -1,18 +1,19 @@
 
 Gamestate = require "hump.gamestate"
 
+require "level"
+
 game = Gamestate.new()
 
 function game:init()
 end
 
-function game:enter(previous)
+function game:enter(previous, filename)
 	-- Load level
 	game.level = Level:new()
-	if not game.load("test") then
-		-- TODO: Create an error
+	if not game.load(filename) then
+		-- TODO: Switch back to the menu and pass an error
 	end
-	-- TODO
 	-- Initialize player
 	-- TODO
 end
