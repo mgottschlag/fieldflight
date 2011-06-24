@@ -66,3 +66,4 @@ function Settings:saveSettings()
 	end
 	return love.filesystem.write(self.path, data, 100000)
 end
+
