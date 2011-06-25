@@ -37,17 +37,27 @@ function game:update(dt)
 	for i = 1, numberOfPlayers do
 		self["player"..i]:checkInput(dt)
 	end
-	
+	for i = 1, numberOfPlayers do
+		self["player"..i].spaceship:update(dt)
+	end
 end
 
 function game:draw()
-	self.level:drawFieldVectors(Vector.new(50, 50), Vector.new(0, 0),
-		Vector.new(300, 300), Vector.new(100, 100), 70)
-	self.level:draw(Vector.new(50, 50), Vector.new(0, 0),
-		Vector.new(300, 300))
-	--Let the players draw the spaceships
 	for i = 1, numberOfPlayers do
-		self["player"..i].spaceship:draw()
+		-- Calculate screen area
+		-- TODO
+		-- Draw level
+		-- TODO: Offset, 
+		self.level:drawFieldVectors(Vector.new(50, 50), Vector.new(0, 0),
+			Vector.new(300, 300), Vector.new(100, 100), 70)
+		self.level:draw(Vector.new(50, 50), Vector.new(0, 0),
+			Vector.new(300, 300))
+		--Let the players draw the spaceships
+		for j = 1, numberOfPlayers do
+			self["player"..j].spaceship:draw()
+		end
+		-- Draw statistics (speed, time)
+		-- TODO
 	end
 	
 end
