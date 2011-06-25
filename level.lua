@@ -53,6 +53,8 @@ function Level:loadFromFile(filename)
 				self.level_height = tonumber(words[2])
 			elseif words[1] == "grid_cell_width" and #words == 2 then
 				self.grid_cell_width = tonumber(words[2])
+			elseif words[1] == "box_width" and #words == 2 then
+				self.box_width = tonumber(words[2])
 			elseif words[1] == "magnet" then
 				local new_magnet = {}
 				new_magnet.pos_x = tonumber(words[2])
@@ -79,16 +81,33 @@ function Level:calcMagnetField()
 		--The Edgepositions of the Magnet in Rasterunits
 		magnet.edges = self:calcMagnetEdgePos(magnet)
 		for point in magnet.edges do
-    		for x=1,self.grid_width do
-    		  local line = {}
-    		  for y=1,self.grid_height do
-    		      local fieldStrength = self:calcFieldStrengthAtPoint(magnet.fieldStrength, point, x, y)
-    		      line[y] = Vector.new(0.5, 0.5)
+			local minX = math.floor(point.point.x - self.box_width)
+			local maxX = math.floor(point.point.x + self.box_width)
+			if minX < 1 then
+				minX = 1
+			end
+			if maxX > self.grid_width then
+				maxX = self.grid_width
+			end
+    			for x = minX, maxX do
+    		  		local line = self.field_raster[x]
+    		  		local minY = math.floor(point.point.y - self.box_width)
+				local maxY = math.floor(point.point.y + self.box_width)
+				if minY < 1 then
+					minY = 1
+				end
+				if maxY > self.grid_height then
+					maxY = self.grid_height
+				end
+    		  		for y = minY, maxY do
+    		      			local fieldStrength = self:calcFieldStrengthAtPoint(magnet.fieldStrength, point, x, y)
+    		      			--line[y] = Vector.new(0.5, 0.5)
+    		      			line[y] = line[y] + fieldStrength*self:calcFieldDirection(point, x, y)
+    		  		end
+    		  	self.field_raster[x] = line
+    		  	end
     		  end
-    		  self.field_raster[x] = line
-    		end
-    	end
-    end
+	end
 end
 
 function Level:calcMagnetEdgePos(magnet)
@@ -116,7 +135,8 @@ function Level:calcFieldStrengthAtPoint(fieldStrength, point, x, y)
 end
 
 function Level:calcFieldDirection(point, x, y)
-    local dir = vector.new(point.point.x-x, point.point.y-y)
+	dir = vector.new(point.point.x-x, point.point.y-y)
+	return dir:normalized()
 end
 
 function Level:getFieldVector(x, y)
@@ -155,23 +175,24 @@ function Level:draw(level_offset, scissor_top_left, scissor_size)
 end
 
 function Level:drawFieldVectors(level_offset, scissor_top_left, scissor_size, position, radius)
-	love.graphics.polygon('fill', 	 50, 1,											--top point
-					19, 13,  4, 37,  1, 54,  2, 91,  9, 110,  30, 133,  14, 145,  6, 162, 9, 281, 		--left side 
-					89, 281,  92, 162,  85, 145,  68, 133,  89, 110,  97, 91,  98, 54,  95, 37,  80, 13) 	--right side
+	--love.graphics.polygon('fill', 	 50, 1,											--top point
+	--				19, 13,  4, 37,  1, 54,  2, 91,  9, 110,  30, 133,  14, 145,  6, 162, 9, 281, 		--left side 
+	--				89, 281,  92, 162,  85, 145,  68, 133,  89, 110,  97, 91,  98, 54,  95, 37,  80, 13) 	--right side
 	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.setLine(1, "smooth")
 	love.graphics.setScissor(scissor_top_left.x, scissor_top_left.y,
 		scissor_size.x, scissor_size.y)
-	local circle_top_left = vec_ceil(position + Vector.new(-radius, -radius))
-	local circle_bottom_right = vec_floor(position + Vector.new(radius, radius))
+	love.graphics.line(scissor_top_left.x, scissor_top_left.y, scissor_size.x, scissor_size.y)
+	local circle_top_left = vec_ceil((position + Vector.new(-radius, -radius)) / self.grid_cell_width)
+	local circle_bottom_right = vec_floor((position + Vector.new(radius, radius)) / self.grid_cell_width)
 	-- Clamp drawing into field grid dimensions
 	circle_top_left.x = math.min(math.max(circle_top_left.x, 1), #self.field_raster)
 	circle_bottom_right.x = math.min(math.max(circle_bottom_right.x, 1), #self.field_raster)
 	circle_top_left.y = math.min(math.max(circle_top_left.y, 1), #self.field_raster[1])
 	circle_bottom_right.y = math.min(math.max(circle_bottom_right.y, 1), #self.field_raster[1])
 	-- Draw all field strength vectors within the circle
-	for x=circle_top_left.x,circle_bottom_right.x,self.grid_cell_width do
-		for y=circle_top_left.y,circle_bottom_right.y,self.grid_cell_width do
+	for x=circle_top_left.x,circle_bottom_right.x do
+		for y=circle_top_left.y,circle_bottom_right.y do
 			local current_pos = Vector.new(x, y)
 			if (current_pos - position):len2() < radius^2 then
 				self:drawFieldVector(level_offset, current_pos)
@@ -182,10 +203,10 @@ function Level:drawFieldVectors(level_offset, scissor_top_left, scissor_size, po
 end
 
 function Level:drawFieldVector(level_offset, position)
-	local arrow_start =  position - level_offset
-	local grid_position = vec_floor(position / self.grid_cell_width + vector(0.9, 0.9))
+	local arrow_start =  position * self.grid_cell_width - level_offset
+	--local grid_position = vec_floor(position / self.grid_cell_width + vector(0.9, 0.9))
 	-- Main arrow line
-	local field_strength = self.field_raster[grid_position.x][grid_position.y]
+	local field_strength = self.field_raster[position.x][position.y]
 	field_strength = field_strength / math.sqrt(field_strength:len())
 	field_strength = field_strength * self.grid_cell_width
 	local arrow_end = arrow_start + field_strength
