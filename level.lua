@@ -132,7 +132,7 @@ function Level:calcMagnetEdgePos(magnet)
 	edgeX[1].pole = -1
 	--The second Edge (south)
 	edgeX[2] = {}
-	local vecS = vector(magnet.length/2, 0):rotated(magnet.rot)
+	local vecS = vector(magnet.length/2, 0):rotated(magnet.rot * math.pi / 180)
 	edgeX[2].point = vector((vecS.x + magnet.pos_x) / self.grid_cell_width, (vecS.y + magnet.pos_y) / self.grid_cell_width)
 	edgeX[2].pole = 1
 	return edgeX
@@ -142,9 +142,9 @@ function Level:calcFieldStrengthAtPoint(fieldStrength, point, x, y)
     --distance
     local dist = math.sqrt((point.point.x-x)^2+(point.point.y-y)^2)
     --strength
-    --return point.pole*fieldStrength/(dist^2)
-    -- TODO
-    return point.pole*fieldStrength/dist
+    return point.pole*fieldStrength/(dist^2)
+    -- TODO: Does not really look good
+    --return point.pole*fieldStrength/dist
 end
 
 function Level:calcFieldDirection(point, x, y)

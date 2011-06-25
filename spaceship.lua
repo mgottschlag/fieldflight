@@ -99,7 +99,7 @@ function Spaceship:calculatePosition(dt, level)
 	self.level = level
 
 	-- TODO: Calculate rotation
-	local acceleration = left_field_strength - right_field_strength
+	local acceleration = right_field_strength - left_field_strength
 	self.v = self.v + acceleration * dt * 1000 -- TODO: 100?
 	print(self.v.x, self.v.y)
 	-- Update position
