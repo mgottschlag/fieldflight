@@ -97,18 +97,16 @@ function Level:calcMagnetEdgePos(magnet)
     edgeX = {}
 	--The first Edge (north)
 	edgeX[1] = {}
-	local x1 = (magnet.pos_x - math.cos(magnet.rot)*magnet.length/2) / self.grid_cell_width
-	local y1 = ((magnet.pos_y) - math.sin(magnet.rot)*magnet.length/2) / self.grid_cell_width
-	edgeX[1].point = Vector.new(x1, y1)
-	print("north " .. x1 .. " " .. y1)
+	local vecN = vector(-magnet.length/2, magnet.width/2):rotated(magnet.rot)
+	edgeX[1].point = vector((vecN.x + magnet.pos_x) / self.grid_cell_width, (vecN.y + magnet.pos_y) / self.grid_cell_width)
+	print("north " .. edgeX[1].point.x .. " " .. edgeX[1].point.y)
 	edgeX[1].pole = -1
 	--The second Edge (south)
 	edgeX[2] = {}
-	local x2 = (magnet.pos_x + math.cos(magnet.rot)*magnet.length/2) / self.grid_cell_width
-	local y2 = ((magnet.pos_y) + math.sin(magnet.rot)*magnet.length/2) / self.grid_cell_width
-	edgeX[2].point = Vector.new(x2, y2)
+	local vecS = vector(magnet.length/2, magnet.width/2):rotated(magnet.rot)
+	edgeX[2].point = vector((vecS.x + magnet.pos_x) / self.grid_cell_width, (vecS.y + magnet.pos_y) / self.grid_cell_width)
+	print("south " .. edgeX[2].point.x .. " " .. edgeX[2].point.y)
 	edgeX[2].pole = 1
-	print("south " .. x2 .. " " .. y2)
 	return edgeX
 end
 
