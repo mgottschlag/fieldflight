@@ -1,6 +1,7 @@
 Class = require "hump.class"
 require "anal/AnAL"
 vector = require "hump.vector"
+Hardon = require "hardoncollider"
 
 Spaceship = Class(function(self)
 	self.v = vector(0,0)
@@ -10,6 +11,15 @@ Spaceship = Class(function(self)
 	self.y = 0
 	self.startX = 0
 	self.startY = 0
+	self.spaceship_polygon = {	50, 1,			--top point
+		19, 13,  4, 37,  1, 54,  2, 91,  9, 110,  30, 
+		133,  14, 145,  6, 162, 9, 281, 		--left side 
+			89, 281,  92, 162,  85, 145,  68, 133,  89, 
+			110,  97, 91,  98, 54,  95, 37,  80, 13} 	--right side}
+	
+	
+	
+	self.hardonPolygon = Hardon.addPolygon(unpack(self.spaceship_polygon))
 	--self.initialized --TODO weg!
 
 	--self.image
@@ -21,9 +31,6 @@ end)
 local width = 200
 local height = 200
 local scale = 0.5
-local spaceship_polygon = {	50, 1,											--top point
-				19, 13,  4, 37,  1, 54,  2, 91,  9, 110,  30, 133,  14, 145,  6, 162, 9, 281, 		--left side 
-				89, 281,  92, 162,  85, 145,  68, 133,  89, 110,  97, 91,  98, 54,  95, 37,  80, 13} 	--right side}
 
 function Spaceship:countdown( player, img_path, x, y )
 --TODO startrichtung muss von level abhängig sein
@@ -36,6 +43,7 @@ function Spaceship:countdown( player, img_path, x, y )
 	self.width = 100
 	self.height = 282
 	self.scale = 0.5
+	self:scaleSpaceshipPolygon()
 	-- newAnimation(plane_img, 200, 200, 0, 2)
 end
 
@@ -47,26 +55,59 @@ function Spaceship:backToTheRoots()
 	self:invertPolarisation(1)
 end
 
-function Spaceship:update(dt)
-	self:calculatePosition(dt)
+function Spaceship:update(dt, level)
+	self:calculatePosition(dt, level)
 end
 
 function Spaceship:draw(level_offset)
+	local xPos = self.x - level_offset.x
+	local yPos = self.y - level_offset.y
+	local radiant = self.rotation / 180 * math.pi
 	-- love.graphics.draw( drawable, x, y, orientation, scaleX, scaleY, originX, originY )
-	self.spaceship_animation:draw(self.x - level_offset.x, self.y - level_offset.y,
-		self.rotation / 180 * math.pi, self.scale, self.scale, 
+	self.spaceship_animation:draw(xPos, yPos,
+		radiant, self.scale, self.scale, 
 		self.width / 2, self.height / 2)
+	
+	self.hardonPolygon:setRotation(radiant)
+	self.hardonPolygon:moveTo(xPos, yPos) --TODO "+50" weg - debug
+	self.hardonPolygon:draw("fill")
+
+	-- Debug: Forces
+	local right = Vector(10, 0):rotated(self.rotation / 180 * math.pi)
+	local left = -right
+	local right_sample_pos = Vector(self.x, self.y) + right
+	local right_field_strength = self.level:getFieldVector(right_sample_pos.x, right_sample_pos.y)
+	local left_sample_pos = Vector(self.x, self.y) + left
+	local left_field_strength = self.level:getFieldVector(left_sample_pos.x, left_sample_pos.y)
+	
+	drawLineArrow(right_sample_pos - level_offset, right_sample_pos - right_field_strength * 100 - level_offset)
+	drawLineArrow(left_sample_pos - level_offset, left_sample_pos + left_field_strength * 100 - level_offset)
 end
 
-function Spaceship:calculatePosition(dt)
-	self.x = self.x - self.v.x * dt
-	self.y = self.y - self.v.y * dt
+function Spaceship:calculatePosition(dt, level)
+	-- Apply acceleration because of magnet field
+	local right = Vector(0, 10):rotated(self.rotation / 180 * math.pi)
+	local left = -right
+	local right_sample_pos = Vector(self.x, self.y) + right
+	local right_field_strength = level:getFieldVector(right_sample_pos.x, right_sample_pos.y)
+	local left_sample_pos = Vector(self.x, self.y) + left
+	local left_field_strength = level:getFieldVector(left_sample_pos.x, left_sample_pos.y)
+	
+	-- TODO: Remove this
+	self.level = level
+
+	-- TODO: Sample twice and calculate rotation
+	local acceleration = left_field_strength - right_field_strength
+	self.v = self.v + acceleration * dt * 1000 -- TODO: 100?
+	-- Update position
+	self.x = self.x + self.v.x * dt
+	self.y = self.y + self.v.y * dt
 end
 
 function Spaceship:accelerate(dt)
 	-- The acceleration is applied independently of the current moving direction
 	local acceleration = vector(0,1):rotated((self.rotation/180) * math.pi)
-	self.v = self.v + acceleration * dt * 100 -- TODO: 100?
+	self.v = self.v - acceleration * dt * 100 -- TODO: 100?
 end
 
 function Spaceship:rotate(degree)
@@ -95,9 +136,11 @@ function Spaceship:invertPolarisation(polarisation)
 end
 
 function Spaceship:scaleSpaceshipPolygon()
-	for x in self.spaceship_polygon do
-		x = x*self.scale
+	Hardon.remove(self.hardonPolygon)
+	for i=1,#self.spaceship_polygon do
+		self.spaceship_polygon[i] = self.spaceship_polygon[i]*self.scale
 	end
+	self.hardonPolygon = Hardon.addPolygon(unpack(self.spaceship_polygon))
 end
 
 function Spaceship:rotateSpaceshipPolygon()

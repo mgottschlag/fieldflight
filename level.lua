@@ -65,6 +65,11 @@ function Level:loadFromFile(filename)
 				new_magnet.length = tonumber(words[5])
 				new_magnet.width = tonumber(words[6])
 				new_magnet.fieldStrength = tonumber(words[7])
+				-- Add collision shape for the magnet
+				new_magnet.shape = HC.addRectangle(new_magnet.pos_x - new_magnet.length / 2,
+					new_magnet.pos_y - new_magnet.width / 2, new_magnet.pos_x + new_magnet.length / 2,
+					new_magnet.pos_y + new_magnet.width / 2)
+				new_magnet.shape:setRotation(new_magnet.rot * math.pi / 180, new_magnet.pos_x, new_magnet.pos_y)
 				table.insert(self.magnets, new_magnet)
 			elseif words[1] == "start" and #words == 3 then
 				self.start_x = tonumber(words[2])
@@ -143,12 +148,13 @@ end
 
 function Level:getFieldVector(x, y)
 	-- Bilinear interpolation between nearest sampled values
-	local floor_x = math.max(math.floor(x), 1)
-	local ceil_x = math.min(math.ceil(x), self.grid_width)
-	local floor_y = math.max(math.floor(y), 1)
-	local ceil_y = math.min(math.ceil(y), self.grid_height)
-	local fraction_x = x - floor_x
-	local fraction_y = y - floor_y
+	local floor_x = math.min(math.max(math.floor(x / self.grid_cell_width), 1), self.grid_width)
+	local ceil_x = math.min(math.max(math.ceil(x / self.grid_cell_width), 1), self.grid_width)
+	local floor_y = math.min(math.max(math.floor(y / self.grid_cell_width), 1), self.grid_width)
+	local ceil_y = math.min(math.max(math.ceil(y / self.grid_cell_width), 1), self.grid_width)
+	local fraction_x = x / self.grid_cell_width - floor_x
+	local fraction_y = y / self.grid_cell_width - floor_y
+	print("fraction_x: "..fraction_x)
 	-- Clamp values into [1..0]
 	fraction_x = math.max(math.min(fraction_x, 1), 0)
 	fraction_y = math.max(math.min(fraction_y, 1), 0)
@@ -157,10 +163,10 @@ function Level:getFieldVector(x, y)
 	local v_2 = self.field_raster[ceil_x][floor_y]
 	local v_3 = self.field_raster[ceil_x][ceil_y]
 	-- Interpolation along y axis
-	v_0 = v_0:interpolate(v_1, fraction_y)
-	v_2 = v_2:interpolate(v_3, fraction_y)
+	v_0 = vec_interpolate(v_0, v_1, fraction_y)
+	v_2 = vec_interpolate(v_2, v_3, fraction_y)
 	-- Interpolation along z axis
-	return v_0:interpolate(v_2, fraction_x)
+	return vec_interpolate(v_0, v_2, fraction_x)
 end
 
 function Level:draw(level_offset, scissor_top_left, scissor_size)
@@ -215,4 +221,11 @@ function Level:drawFieldVector(level_offset, position)
 	love.graphics.line(arrow_end.x, arrow_end.y, side_end.x, side_end.y)
 	side_end = field_strength * 0.7 - orthogonal + arrow_start
 	love.graphics.line(arrow_end.x, arrow_end.y, side_end.x, side_end.y)
+end
+
+function Level:unload()
+	-- Destroy magnet shapes
+	for _,magnet in pairs(self.magnets) do
+		HC.remove(magnet.shape)
+	end
 end

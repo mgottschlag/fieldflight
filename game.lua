@@ -49,6 +49,10 @@ function game:enter(previous, filename, multiplayer)
 	
 end
 
+function game:leave()
+	self.level:unload()
+end
+
 function game:update(dt)
 	dt = math.min(dt, tonumber(setting:getValue("framerate", tostring(1/30))))
 	--Let the players check the input devices
@@ -56,7 +60,7 @@ function game:update(dt)
 		self["player"..i]:checkInput(dt)
 	end
 	for i = 1, numberOfPlayers do
-		self["player"..i].spaceship:update(dt)
+		self["player"..i].spaceship:update(dt, self.level)
 		self["player"..i].spaceship:restrictArea(Vector(0, 0), Vector(self.level.level_width, self.level.level_height))
 		-- Update the arrow
 		self["player"..i].arrow:update()
