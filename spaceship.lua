@@ -9,6 +9,7 @@ Spaceship = Class(function(self)
 	self.polarisation = 0
 	self.x = 0
 	self.y = 0
+	self.destroy = false
 	self.startX = 0
 	self.startY = 0
 	self.spaceship_polygon = {	50, 1,			--top point
@@ -37,7 +38,7 @@ function Spaceship:countdown( player, img_path, x, y, rotation, level )
 	self.startX = x
 	self.startY = y
 	self.image = love.graphics.newImage(img_path)
-	self.spaceship_animation = newAnimation(self.image, 100, 282, 0, 1)
+	self.spaceship_animation = newAnimation(self.image, 100, 282, 0, 3)
 	self:backToTheRoots()
 	self.player = player
 	self.width = 100
@@ -48,6 +49,18 @@ function Spaceship:countdown( player, img_path, x, y, rotation, level )
 	-- newAnimation(plane_img, 200, 200, 0, 2)
 end
 
+function Spaceship:destroy()
+	self.spaceship_animation:seek(2)
+	self.destroy = true
+end
+
+local clock = os.clock
+function sleep(n)  -- seconds
+  local t0 = clock()
+  while clock() - t0 <= n do end
+end
+
+
 function Spaceship:backToTheRoots()
 	self.v = vector(0,0)
 	self.rotation = 0
@@ -56,21 +69,24 @@ function Spaceship:backToTheRoots()
 	self:invertPolarisation(1)
 	self.hardonPolygon:setRotation(self.rotation / 180 * math.pi)
 	self.hardonPolygon:moveTo(self.x, self.y)
+	self.animation:seek(1)
 end
 
 function Spaceship:update(dt, level)
+	if self.destroy == true then
+		sleep(1)
+		self.destroy = false
+	end
 	self:calculatePosition(dt, level)
 end
 
 function Spaceship:draw(level_offset)
 	local xPos = self.x - level_offset.x
 	local yPos = self.y - level_offset.y
-	-- love.graphics.draw( drawable, x, y, orientation, scaleX, scaleY, originX, originY )
 	self.spaceship_animation:draw(xPos, yPos,
 		self.rotation / 180 * math.pi, self.scale, self.scale, 
 		self.width / 2, self.height / 2)
 	
-	--self.hardonPolygon:draw("fill")
 
 	-- Debug: Forces
 	local right = Vector(10, 0):rotated(self.rotation / 180 * math.pi)
