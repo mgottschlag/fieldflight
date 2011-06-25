@@ -97,17 +97,18 @@ function Level:calcMagnetEdgePos(magnet)
     edgeX = {}
 	--The first Edge (north)
 	edgeX[1] = {}
-	local x1 = (magnet.pos_x - math.sin(magnet.rot)*magnet.length) / self.grid_cell_width
-	local y1 = ((magnet.pos_y+magnet.width/2) - math.cos(magnet.rot)*magnet.length) / self.grid_cell_width
+	local x1 = (magnet.pos_x - math.cos(magnet.rot)*magnet.length/2) / self.grid_cell_width
+	local y1 = ((magnet.pos_y) - math.sin(magnet.rot)*magnet.length/2) / self.grid_cell_width
 	edgeX[1].point = Vector.new(x1, y1)
-	love.graphics.print(x1 .. " " .. y1, 300, 100)
+	print("north " .. x1 .. " " .. y1)
 	edgeX[1].pole = -1
 	--The second Edge (south)
 	edgeX[2] = {}
-	local x1 = (magnet.pos_x + math.sin(magnet.rot)*magnet.length) / self.grid_cell_width
-	local y1 = ((magnet.pos_y + magnet.width/2) + math.cos(magnet.rot)*magnet.length) / self.grid_cell_width
+	local x2 = (magnet.pos_x + math.cos(magnet.rot)*magnet.length/2) / self.grid_cell_width
+	local y2 = ((magnet.pos_y) + math.sin(magnet.rot)*magnet.length/2) / self.grid_cell_width
 	edgeX[2].point = Vector.new(x2, y2)
 	edgeX[2].pole = 1
+	print("south " .. x2 .. " " .. y2)
 	return edgeX
 end
 
@@ -151,7 +152,7 @@ function Level:draw(level_offset, scissor_top_left, scissor_size)
 		scissor_size.x, scissor_size.y)
 	-- Draw magnets
 	for _,magnet in pairs(self.magnets) do
-		love.graphics.draw(magnet_img, magnet.pos_x, magnet.pos_y, rotation,
+		love.graphics.draw(magnet_img, magnet.pos_x - level_offset.x, magnet.pos_y - level_offset.y, rotation,
 			magnet.length / 200, magnet.width / 100, 100, 50)
 	end
 	-- Draw fields around the magnets
@@ -184,10 +185,11 @@ function Level:drawFieldVectors(level_offset, scissor_top_left, scissor_size, po
 end
 
 function Level:drawFieldVector(level_offset, position)
-	local arrow_start = level_offset + position
+	local arrow_start =  position - level_offset
 	local grid_position = vec_floor(position / self.grid_cell_width + vector(0.9, 0.9))
 	-- Main arrow line
 	local field_strength = self.field_raster[grid_position.x][grid_position.y]
+	field_strength = field_strength / math.sqrt(field_strength:len())
 	field_strength = field_strength * self.grid_cell_width
 	local arrow_end = arrow_start + field_strength
 	love.graphics.line(arrow_start.x, arrow_start.y, arrow_end.x, arrow_end.y)
