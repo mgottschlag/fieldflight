@@ -28,7 +28,7 @@ function game:enter(previous, filename)
 	self.player1:init(1,dt)
 	
 	-- Initialize arrow
-	self.arrow:init()
+	self.arrow:init(self.player1.spaceship, self.level)
 	
 	--initilize sound
 	--source = love.audio.newSource( "sound/main.wav" , "stream" )

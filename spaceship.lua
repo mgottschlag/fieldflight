@@ -77,6 +77,14 @@ function Spaceship:getSpeed()
 	return self.v.len()
 end
 
+function Spaceship:getXPos()
+	return self.x
+end
+
+function Spaceship:getYPos()
+	return self.y
+end
+
 function Spaceship:getPolarisation()
 	return self.polarisation
 end

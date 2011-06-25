@@ -35,10 +35,12 @@ function Level:load(filename)
 		local line = {}
 		for y=1,self.grid_height do
 			-- Initialize the array with zero field strength
-			line[y] = Vector.new(0.5, 0.5)
+			line[y] = Vector.new(0, 0)
 		end
 		self.field_raster[x] = line
 	end
+	
+	self:calcMagnetField()
 
 	return false
 end
@@ -77,10 +79,10 @@ end
 
 function Level:calcMagnetField()
 	-- Add influence of all magnets to the field strength grid
-	for magnet in self.magnets do
+	for _,magnet in pairs(self.magnets) do
 		--The Edgepositions of the Magnet in Rasterunits
 		magnet.edges = self:calcMagnetEdgePos(magnet)
-		for point in magnet.edges do
+		for _,point in pairs(magnet.edges) do
 			local minX = math.floor(point.point.x - self.box_width)
 			local maxX = math.floor(point.point.x + self.box_width)
 			if minX < 1 then
@@ -114,13 +116,13 @@ function Level:calcMagnetEdgePos(magnet)
     edgeX = {}
 	--The first Edge (north)
 	edgeX[1] = {}
-	local vecN = vector(-magnet.length/2, magnet.width/2):rotated(magnet.rot)
+	local vecN = vector(-magnet.length/2, 0):rotated(magnet.rot)
 	edgeX[1].point = vector((vecN.x + magnet.pos_x) / self.grid_cell_width, (vecN.y + magnet.pos_y) / self.grid_cell_width)
 	print("north " .. edgeX[1].point.x .. " " .. edgeX[1].point.y)
 	edgeX[1].pole = -1
 	--The second Edge (south)
 	edgeX[2] = {}
-	local vecS = vector(magnet.length/2, magnet.width/2):rotated(magnet.rot)
+	local vecS = vector(magnet.length/2, 0):rotated(magnet.rot)
 	edgeX[2].point = vector((vecS.x + magnet.pos_x) / self.grid_cell_width, (vecS.y + magnet.pos_y) / self.grid_cell_width)
 	print("south " .. edgeX[2].point.x .. " " .. edgeX[2].point.y)
 	edgeX[2].pole = 1
@@ -191,10 +193,12 @@ function Level:drawFieldVectors(level_offset, scissor_top_left, scissor_size, po
 	circle_top_left.y = math.min(math.max(circle_top_left.y, 1), #self.field_raster[1])
 	circle_bottom_right.y = math.min(math.max(circle_bottom_right.y, 1), #self.field_raster[1])
 	-- Draw all field strength vectors within the circle
+	radius = radius / self.grid_cell_width
+	local circle_center = position / self.grid_cell_width
 	for x=circle_top_left.x,circle_bottom_right.x do
 		for y=circle_top_left.y,circle_bottom_right.y do
 			local current_pos = Vector.new(x, y)
-			if (current_pos - position):len2() < radius^2 then
+			if (current_pos - circle_center):len2() < radius^2 then
 				self:drawFieldVector(level_offset, current_pos)
 			end
 		end

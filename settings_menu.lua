@@ -3,6 +3,9 @@ Gamestate = require "hump.gamestate"
 goo = require "goo/goo"
 
 local menu_controls = {}
+local progressbar_width = 200
+local progressbar_height = 20
+local progressbar_distance = 40
 
 settings_menu = Gamestate.new()
 
@@ -32,11 +35,24 @@ function settings_menu:initButtons()
 		-- TODO: Save settings
 		Gamestate.switch(menu)
 	end
+	-- Volume progressbar
+	menu_controls["volume_progress"] = goo.progressbar:new()
+	menu_controls["volume_progress"]:setPos(screen_width/2, screen_height - 100)
+	menu_controls["volume_progress"]:setSize(progressbar_width, progressbar_height)
+	menu_controls["volume_progress"]:setRange(0, 100)
+	menu_controls["volume_progress"]:setProgress(50)
+	
+	-- Effect-volume progressbar
+	menu_controls["effect_volume_progress"] = goo.progressbar:new()
+	menu_controls["effect_volume_progress"]:setPos(screen_width/2, screen_height - 100+progressbar_distance)
+	menu_controls["effect_volume_progress"]:setSize(progressbar_width, progressbar_height)
+	menu_controls["effect_volume_progress"]:setRange(0, 100)
+	menu_controls["effect_volume_progress"]:setProgress(50)
 end
 
 function settings_menu:initGeneral()
 	-- Music volume
-	menu_controls["music"] = goo.slider:new()
+	--menu_controls["music"] = goo.slider:new()
 	
 	-- TODO
 	-- Effect volume
