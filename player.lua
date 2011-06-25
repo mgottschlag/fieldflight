@@ -32,15 +32,15 @@ function Player:init(number, dt)
 	self.buttonUp = setting:getValue("player"..number.."buttonVollgas", "up")
 end
 
-function Player:checkInput()
+function Player:checkInput(dt)
 	if love.joystick.getNumJoysticks() > 0 and usesJoystickNumber > -1 then
 		--Achsen werden benutzt
 		if usesJoystickAxis == 1 then
 			axisDir1, axisDir2, axisDirN = love.joystick.getAxes( joystickNumber )
 			if axisDir1 > 0 then
-				self.spaceship:rotate(360/dt)
+				self.spaceship:rotate(360*dt)
 			elseif axisDir1 < 0 then
-				self.spaceship:rotate(-360/dt)
+				self.spaceship:rotate(-360*dt)
 			end
 			if axisDir2 < 0 then
 				self.spaceship:accelerate(dt)
@@ -49,9 +49,9 @@ function Player:checkInput()
 		end
 		--Achsen werden nicht benutzt
 		if love.joystick.isDown(joystickNumber, self.buttonLeft) then
-			self.spaceship:rotate(360/dt)
+			self.spaceship:rotate(360*dt)
 		elseif love.joystick.isDown(joystickNumber, self.buttonRight) then
-			self.spaceship:rotate(-360/dt)
+			self.spaceship:rotate(-(360*dt))
 		elseif love.joystick.isDown(joystickNumber, self.buttonVollgas) then
 			self.spaceship:accelerate(dt)
 		end
@@ -60,9 +60,9 @@ function Player:checkInput()
 	end
 	--Joystick wird nicht benutzt
 	if love.keyboard.isDown(self.buttonLeft) then
-		self.spaceship:rotate(360/dt)
+		self.spaceship:rotate(360*dt)
 	elseif love.keyboard.isDown(self.buttonRight) then
-		self.spaceship:rotate(-360/dt)
+		self.spaceship:rotate(-(360*dt))
 	elseif love.keyboard.isDown(self.buttonVollgas) then
 		self.spaceship:accelerate(dt)
 	end	

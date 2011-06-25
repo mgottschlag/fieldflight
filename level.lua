@@ -6,6 +6,9 @@ require "utility"
 
 local magnet_img = love.graphics.newImage("graphics/Magnet-Test.png")
 
+
+
+
 Level = Class(function(self)
 end)
 
@@ -20,6 +23,7 @@ function Level:load(filename)
 	--Initialize Magnets
 
 
+
 	-- We sample the field strength every x pixels
 	self.grid_width = self.level_width / self.grid_cell_width
 	self.grid_height = self.level_height / self.grid_cell_width
@@ -31,13 +35,11 @@ function Level:load(filename)
 		local line = {}
 		for y=1,self.grid_height do
 			-- Initialize the array with zero field strength
-			line[y] = Vector.new(0, 0)
+			line[y] = Vector.new(0.5, 0.5)
 		end
 		self.field_raster[x] = line
 	end
-	
-	self:calcMagnetField()
-	
+
 	return false
 end
 
@@ -73,19 +75,15 @@ end
 
 function Level:calcMagnetField()
 	-- Add influence of all magnets to the field strength grid
-	for _,magnet in pairs(self.magnets) do
+	for magnet in self.magnets do
 		--The Edgepositions of the Magnet in Rasterunits
 		magnet.edges = self:calcMagnetEdgePos(magnet)
-		for _,point in pairs(magnet.edges) do
+		for point in magnet.edges do
     		for x=1,self.grid_width do
-    		  local line = self.field_raster[x]
+    		  local line = {}
     		  for y=1,self.grid_height do
     		      local fieldStrength = self:calcFieldStrengthAtPoint(magnet.fieldStrength, point, x, y)
-    		      local fieldDir = self:calcFieldDirection(point, x, y)
-    		      local fieldVec = fieldStrength*fieldDir
-    		      --line[y] = Vector(0.5, 0.5)
-    		      --print(self.field_raster[x]
-    		      line[y] = line[y] + fieldVec
+    		      line[y] = Vector.new(0.5, 0.5)
     		  end
     		  self.field_raster[x] = line
     		end
@@ -119,8 +117,6 @@ end
 
 function Level:calcFieldDirection(point, x, y)
     local dir = vector.new(point.point.x-x, point.point.y-y)
-    local length = math.sqrt((point.point.x-x)^2+(point.point.y-y)^2)
-    return vector.new(dir.x/length, dir.y/length)
 end
 
 function Level:getFieldVector(x, y)
@@ -159,6 +155,9 @@ function Level:draw(level_offset, scissor_top_left, scissor_size)
 end
 
 function Level:drawFieldVectors(level_offset, scissor_top_left, scissor_size, position, radius)
+	love.graphics.polygon('fill', 	 50, 1,											--top point
+					19, 13,  4, 37,  1, 54,  2, 91,  9, 110,  30, 133,  14, 145,  6, 162, 9, 281, 		--left side 
+					89, 281,  92, 162,  85, 145,  68, 133,  89, 110,  97, 91,  98, 54,  95, 37,  80, 13) 	--right side
 	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.setLine(1, "smooth")
 	love.graphics.setScissor(scissor_top_left.x, scissor_top_left.y,

@@ -1,7 +1,7 @@
 level_width 2000
 level_height 10000
 grid_cell_width 10
-start 100 100
+start 0 0
 end 1900 9900
 magnet 150 150 0 50 20 1
 

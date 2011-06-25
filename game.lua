@@ -18,8 +18,8 @@ end
 
 function game:enter(previous, filename)
 	-- Load level
-	game.level = Level()
-	if not game.level:load(filename) then
+	self.level = Level()
+	if not self.level:load(filename) then
 		-- TODO: Switch back to the menu and pass an error
 	end
 	-- Initialize players
@@ -33,21 +33,23 @@ end
 
 function game:update(dt)
 	dt = math.min(dt, tonumber(setting:getValue("framerate", tostring(1/30))))
-	
+	--Let the players check the input devices
+	for i = 1, numberOfPlayers do
+		self["player"..i]:checkInput(dt)
+	end
 	
 end
 
 function game:draw()
-	--Let the players check the input sources
+	self.level:drawFieldVectors(Vector.new(50, 50), Vector.new(0, 0),
+		Vector.new(300, 300), Vector.new(100, 100), 70)
+	self.level:draw(Vector.new(50, 50), Vector.new(0, 0),
+		Vector.new(300, 300))
+	--Let the players draw the spaceships
 	for i = 1, numberOfPlayers do
-		self["player"..i]:checkInput()
 		self["player"..i].spaceship:draw()
 	end
 	
-	test_level:draw(Vector.new(50, 50), Vector.new(0, 0),
-		Vector.new(300, 300))
-	test_level:drawFieldVectors(Vector.new(50, 50), Vector.new(0, 0),
-		Vector.new(300, 300), Vector.new(100, 100), 70)
 end
 
 function game:keyreleased(key)

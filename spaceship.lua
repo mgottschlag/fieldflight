@@ -3,15 +3,16 @@ require "anal/AnAL"
 vector = require "hump.vector"
 
 Spaceship = Class(function(self)
-	local v = vector(1,1)
-	local rotation = 0
-	local polarisation = 0
-	local speed = 0
-	local x = 0
-	local y = 0
-	local startX = 0
-	local startY = 0
-	local initialized --TODO weg!
+	self.v = vector(0,0)
+	self.acceleration = vector(0,0)
+	self.rotation = 0
+	self.polarisation = 0
+	self.speed = 0
+	self.x = 0
+	self.y = 0
+	self.startX = 0
+	self.startY = 0
+	--self.initialized --TODO weg!
 
 	--self.image
 	--self.player
@@ -32,19 +33,21 @@ function Spaceship:countdown( player, img_path, x, y )
 	self.startX = x
 	self.startY = y
 	self.image = love.graphics.newImage(img_path)
-	self.spaceship_animation = newAnimation(self.image, 200, 200, 0, 1)
+	self.spaceship_animation = newAnimation(self.image, 100, 282, 0, 1)
 	self:backToTheRoots()
 	self.player = player
-	self.width = 200
-	self.height = 200
+	self.width = 100
+	self.height = 282
 	self.scale = 0.5
 	self.acceleration = 0.5
 	-- newAnimation(plane_img, 200, 200, 0, 2)
 end
 
 function Spaceship:backToTheRoots()
-	self.v = vector(1,1)
+	self.v = vector(0,0)
+	self.acceleration = vector(0,0)
 	self.rotation = 0
+	print(self.rotation)
 	self.speed = 0
 	self.x = self.startX
 	self.y = self.startY
@@ -61,41 +64,28 @@ function Spaceship:draw()
 	self:calculatePosition()
 	-- love.graphics.draw( drawable, x, y, orientation, scaleX, scaleY, originX, originY )
 	self.spaceship_animation:draw(self.x, self.y,
-	0, 1, 1,
-		--0, self.scale, self.scale, 
-		-50, -50)
-	--	-(self.width / 4), -(self.height / 4))
+		self.rotation / 180 * math.pi, self.scale, self.scale, 
+		self.width / 2, self.height / 2)
 end
 
 function Spaceship:calculatePosition()
-	--TODO was geht hier nicht?
-	local add = 0
-	--if self.v ~≃ nil then 
-	--	add = self.v.x 
-	--end
-	self.x = self.x + add
-	--if (self.v =≃ nil) then else add = self.v.x end
-	self.y = self.y + add
+	self.x = self.x - self.v.x
+	self.y = self.y - self.v.y
 end
 
 function Spaceship:accelerate(dt)
-	-- formel: v = a * t
-	-- TODO level.getFieldVector
-	-- spaceship_animation:move(speedX * dt, speedY * dt)
-	self.speed = self.speed + (self.acceleration * dt)
+	-- The acceleration is applied independently of the current moving direction
+	self.acceleration = vector(0,1):rotated((self.rotation/180) * math.pi)
+	self.v = self.v + self.acceleration * dt
+	print(self.speed)
 end
 
 function Spaceship:rotate(degree)
-	rotation = math.mod(rotation + degre/360) --TODO testen! Doku fehlt
-	love.graphics.push(self.spaceship_animation)
-	love.graphics.rotate(rotation)
-	love.graphics.pop()
+	self.rotation = math.mod(self.rotation - degree, 360)
 end
 
 function Spaceship:updateVector()
-	self.v:rotate_inplace((self.rotation/360) * math.pi)
-	self.v:normalize_inplace()
-	self.v = self.v * self.speed
+	-- TODO: Remove this?
 end
 
 function Spaceship:getSpeed()
