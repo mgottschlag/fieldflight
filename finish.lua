@@ -5,8 +5,8 @@ Hardon = require "hardoncollider"
 
 Finish = Class(function(self)
 	self.hit =0 
-	self.img = love.graphics.newImage("graphics/Arrow.png") 
-	self.animation = newAnimation(self.img,64, 64, 0, 0) --self.hit)
+	self.img = love.graphics.newImage("graphics/target.png") 
+	self.animation = newAnimation(self.img,283, 346, 0, self.hit)
 	self.shape = HC.addCircle(100, 100, 50)
 end)
 
@@ -21,9 +21,9 @@ function Finish:initialize()
 end
 
 function Finish:draw(x, y)
-	print(x, y)
+	self.animation = newAnimation(self.img,283, 346, 0, self.hit)
 	self.shape:moveTo(x, y)
 	if self.hit ~= 0 then
-		self.animation:draw(250,250)
+		self.animation:draw(x, y)
 	end
 end
