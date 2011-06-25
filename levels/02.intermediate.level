@@ -1,0 +1,28 @@
+level_width 1000
+level_height 1000
+grid_cell_width 20
+box_width 40
+start 900 900
+end 900 700
+
+magnet 804 812 180 30 25 0.5
+magnet 804 837 180 30 25 0.5
+magnet 804 862 180 30 25 0.5
+magnet 804 867 180 30 25 0.5
+magnet 804 892 180 30 25 0.5
+magnet 804 917 180 30 25 0.5
+magnet 804 942 180 30 25 0.5
+magnet 804 967 180 30 25 0.5
+
+magnet 700 300 -45 200 80 8
+magnet 300 300 45 200 80 8
+magnet 700 700 45 200 80 2
+magnet 300 700 135 200 80 8
+
+magnet 500 350 0 280 80 1
+magnet 350 500 90 280 80 1
+magnet 500 650 180 280 80 1
+magnet 650 500 -90 280 80 1
+
+magnet 30 30 45 60 30 8
+

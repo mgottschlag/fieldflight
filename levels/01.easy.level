@@ -1,0 +1,16 @@
+level_width 1000
+level_height 600
+grid_cell_width 20
+box_width 40
+start 50 540
+end 900 40
+
+magnet 300 400 90 400 20 2
+magnet 320 400 90 400 20 2
+magnet 340 400 90 400 20 2
+
+magnet 600 200 90 400 20 2
+magnet 620 200 90 400 20 2
+magnet 640 200 90 400 20 2
+
+
