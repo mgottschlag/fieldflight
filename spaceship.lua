@@ -32,7 +32,7 @@ local width = 200
 local height = 200
 local scale = 0.5
 
-function Spaceship:countdown( player, img_path, x, y )
+function Spaceship:countdown( player, img_path, x, y, rotation )
 --TODO startrichtung muss von level abhängig sein
 	self.startX = x
 	self.startY = y
@@ -53,6 +53,8 @@ function Spaceship:backToTheRoots()
 	self.x = self.startX
 	self.y = self.startY
 	self:invertPolarisation(1)
+	self.hardonPolygon:setRotation(self.rotation / 180 * math.pi)
+	self.hardonPolygon:moveTo(self.x, self.y)
 end
 
 function Spaceship:update(dt, level)
@@ -62,14 +64,11 @@ end
 function Spaceship:draw(level_offset)
 	local xPos = self.x - level_offset.x
 	local yPos = self.y - level_offset.y
-	local radiant = self.rotation / 180 * math.pi
 	-- love.graphics.draw( drawable, x, y, orientation, scaleX, scaleY, originX, originY )
 	self.spaceship_animation:draw(xPos, yPos,
-		radiant, self.scale, self.scale, 
+		self.rotation / 180 * math.pi, self.scale, self.scale, 
 		self.width / 2, self.height / 2)
 	
-	self.hardonPolygon:setRotation(radiant)
-	self.hardonPolygon:moveTo(xPos, yPos) --TODO "+50" weg - debug
 	self.hardonPolygon:draw("fill")
 
 	-- Debug: Forces
@@ -79,14 +78,17 @@ function Spaceship:draw(level_offset)
 	local right_field_strength = self.level:getFieldVector(right_sample_pos.x, right_sample_pos.y)
 	local left_sample_pos = Vector(self.x, self.y) + left
 	local left_field_strength = self.level:getFieldVector(left_sample_pos.x, left_sample_pos.y)
+	local center_pos = Vector(self.x, self.y)
+	local force = left_field_strength - right_field_strength
 	
 	drawLineArrow(right_sample_pos - level_offset, right_sample_pos - right_field_strength * 100 - level_offset)
 	drawLineArrow(left_sample_pos - level_offset, left_sample_pos + left_field_strength * 100 - level_offset)
+	drawLineArrow(center_pos - level_offset, center_pos + force * 1000 - level_offset)
 end
 
 function Spaceship:calculatePosition(dt, level)
 	-- Apply acceleration because of magnet field
-	local right = Vector(0, 10):rotated(self.rotation / 180 * math.pi)
+	local right = Vector(0, 15):rotated(self.rotation / 180 * math.pi)
 	local left = -right
 	local right_sample_pos = Vector(self.x, self.y) + right
 	local right_field_strength = level:getFieldVector(right_sample_pos.x, right_sample_pos.y)
@@ -96,12 +98,15 @@ function Spaceship:calculatePosition(dt, level)
 	-- TODO: Remove this
 	self.level = level
 
-	-- TODO: Sample twice and calculate rotation
+	-- TODO: Calculate rotation
 	local acceleration = left_field_strength - right_field_strength
 	self.v = self.v + acceleration * dt * 1000 -- TODO: 100?
+	print(self.v.x, self.v.y)
 	-- Update position
 	self.x = self.x + self.v.x * dt
 	self.y = self.y + self.v.y * dt
+	self.hardonPolygon:setRotation(self.rotation / 180 * math.pi)
+	self.hardonPolygon:moveTo(self.x, self.y)
 end
 
 function Spaceship:accelerate(dt)
@@ -156,19 +161,23 @@ end
 function Spaceship:restrictArea(min, max)
 	if self.x < min.x then
 		self.x = min.x
-		self.v.x = math.min(self.v.x, 0)
-		print("Reset: "..self.v.x)
+		self.v.x = math.max(self.v.x, 0)
 	end
 	if self.y < min.y then
 		self.y = min.y
-		self.v.y = math.min(self.v.y, 0)
+		self.v.y = math.max(self.v.y, 0)
 	end
 	if self.x > max.x then
 		self.x = max.x
-		self.v.x = math.max(self.v.x, 0)
+		self.v.x = math.min(self.v.x, 0)
 	end
 	if self.y > max.y then
 		self.y = max.y
-		self.v.y = math.max(self.v.y, 0)
+		self.v.y = math.min(self.v.y, 0)
 	end
+	self.hardonPolygon:moveTo(self.x, self.y)
+end
+
+function Spaceship:destroy()
+	Hardon.remove(self.hardonPolygon)
 end

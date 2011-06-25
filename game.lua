@@ -15,6 +15,7 @@ local numberOfPlayers = 1
 
 function game:init()
 	self.player1 = Player()
+	self.player2 = Player()
 end
 
 function game:enter(previous, filename, multiplayer)
@@ -42,15 +43,16 @@ function game:enter(previous, filename, multiplayer)
 	self.stars_near = love.graphics.newImage("graphics/stars2.png")
 	
 	--initilize sound
-	--source = love.audio.newSource( "sound/main.wav" , "stream" )
-	TEsound.playLooping("sound/main.ogg", "music")
-	
+	TEsound.playLooping("sound/main.ogg", {"music"} , nil, 1)
 	--TODO tesound
 	
 end
 
 function game:leave()
 	self.level:unload()
+	for i = 1, numberOfPlayers do
+		self["player"..i].spaceship:destroy()
+	end
 end
 
 function game:update(dt)
@@ -65,20 +67,24 @@ function game:update(dt)
 		-- Update the arrow
 		self["player"..i].arrow:update()
 	end
-	print("Player Speed"..self.player1.spaceship:getSpeed())
 	local pitchValue = self.player1.spaceship:getSpeed() + 1
 	if pitchValue < 0  then 
 	pitchValue = pitchValue * -1
 	end
-	
-	--TEsound.pitch("music", pitchValue)
-	--TEsound.play("music")
+
+
+	if pitchValue < 0  then 
+	local pitchValue = (self.player1.spaceship:getSpeed() + 1)/10
+	pitchValue = pitchValue * (-1)
+	end
+	TEsound.cleanup()
+	TEsound.tagPitch("all", pitchValue)
+	HC.update(dt)
 end
 
 function game:draw()
 	for i = 1, numberOfPlayers do
 		local player_position = Vector(self["player"..i].spaceship.x, self["player"..i].spaceship.y)
-		print(player_position.x, player_position.y)
 		-- Calculate screen area
 		-- TODO
 		local scissor_top_left = Vector(0, 0)
@@ -119,7 +125,16 @@ function game:draw()
 				love.graphics.draw(self.stars_near, bg_near_offset.x + x * 256, bg_near_offset.y + y * 256, 0, 1, 1, 0, 0)
 			end
 		end
-		-- TODO
+		-- Level border
+		love.graphics.setLine(2, "smooth")
+		love.graphics.line(0 - level_offset.x, 0 - level_offset.y,
+			0 - level_offset.x, self.level.level_height - level_offset.y)
+		love.graphics.line(0 - level_offset.x, self.level.level_height - level_offset.y,
+			self.level.level_width - level_offset.x, self.level.level_height - level_offset.y)
+		love.graphics.line(0 - level_offset.x, 0 - level_offset.y,
+			self.level.level_width - level_offset.x, 0 - level_offset.y)
+		love.graphics.line(self.level.level_width - level_offset.x, 0 - level_offset.y,
+			self.level.level_width - level_offset.x, self.level.level_height - level_offset.y)
 		-- Draw level
 		self.level:drawFieldVectors(level_offset, scissor_top_left,
 			scissor_size, player_position, 200)
@@ -143,4 +158,14 @@ end
 
 function game:mousereleased(x,y, mouse_btn)
 	-- TODO
+end
+
+function on_collision(dt, a, b)
+	if a == game["player1"].spaceship.hardonPolygon or b == game["player1"].spaceship.hardonPolygon then
+		print("abc", a, b)
+	end
+end
+
+function collision_stop(dt, a, b)
+	print("collision stop")
 end

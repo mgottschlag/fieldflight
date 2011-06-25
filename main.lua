@@ -3,13 +3,11 @@ require "settings"
 require "menu"
 
 require "goo/goo"
-
 HC = require "hardoncollider"
-
-HC.init(100, on_collision, collision_stop)
 
 function love.load()
 	goo:load()
+	HC.init(100, on_collision, collision_stop)
 	Gamestate.registerEvents()
 
 	-- Initialize Joysticks
@@ -51,5 +49,3 @@ end
 
 function love.quit()
 end
-
-

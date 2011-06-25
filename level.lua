@@ -3,6 +3,7 @@ Class = require 'hump.class'
 Vector = require 'hump.vector'
 
 require "utility"
+require "finish"
 
 local magnet_img = love.graphics.newImage("graphics/Magnet-Test.png")
 
@@ -42,6 +43,9 @@ function Level:load(filename)
 	
 	self:calcMagnetField()
 
+	self.finishline = {}
+	self.finishline.finish = Finish()
+	self.finishline.finish:initialize()
 	return false
 end
 
@@ -67,8 +71,7 @@ function Level:loadFromFile(filename)
 				new_magnet.fieldStrength = tonumber(words[7])
 				-- Add collision shape for the magnet
 				new_magnet.shape = HC.addRectangle(new_magnet.pos_x - new_magnet.length / 2,
-					new_magnet.pos_y - new_magnet.width / 2, new_magnet.pos_x + new_magnet.length / 2,
-					new_magnet.pos_y + new_magnet.width / 2)
+					new_magnet.pos_y - new_magnet.width / 2, new_magnet.length, new_magnet.width)
 				new_magnet.shape:setRotation(new_magnet.rot * math.pi / 180, new_magnet.pos_x, new_magnet.pos_y)
 				table.insert(self.magnets, new_magnet)
 			elseif words[1] == "start" and #words == 3 then
@@ -78,6 +81,9 @@ function Level:loadFromFile(filename)
 				self.end_x = tonumber(words[2])
 				self.end_y = tonumber(words[3])
 			end
+			elseif words[1] == "finishline" and #words == 3 then
+				self.finishline.x = tonumber(words[2])
+				self.finishline.y = tonumber(words[3])
 		end
 	end
 end
@@ -96,9 +102,9 @@ function Level:calcMagnetField()
 			if maxX > self.grid_width then
 				maxX = self.grid_width
 			end
-    			for x = minX, maxX do
-    		  		local line = self.field_raster[x]
-    		  		local minY = math.floor(point.point.y - self.box_width)
+    		for x = minX, maxX do
+    			local line = self.field_raster[x]
+    			local minY = math.floor(point.point.y - self.box_width)
 				local maxY = math.floor(point.point.y + self.box_width)
 				if minY < 1 then
 					minY = 1
@@ -106,14 +112,14 @@ function Level:calcMagnetField()
 				if maxY > self.grid_height then
 					maxY = self.grid_height
 				end
-    		  		for y = minY, maxY do
-    		      			local fieldStrength = self:calcFieldStrengthAtPoint(magnet.fieldStrength, point, x, y)
-    		      			--line[y] = Vector.new(0.5, 0.5)
-    		      			line[y] = line[y] + fieldStrength*self:calcFieldDirection(point, x, y)
-    		  		end
-    		  	self.field_raster[x] = line
-    		  	end
-    		  end
+    			for y = minY, maxY do
+  					local fieldStrength = self:calcFieldStrengthAtPoint(magnet.fieldStrength, point, x, y)
+					--line[y] = Vector.new(0.5, 0.5)
+					line[y] = line[y] + fieldStrength*self:calcFieldDirection(point, x, y)
+				end
+			--self.field_raster[x] = line
+			end
+		end
 	end
 end
 
@@ -121,15 +127,13 @@ function Level:calcMagnetEdgePos(magnet)
     edgeX = {}
 	--The first Edge (north)
 	edgeX[1] = {}
-	local vecN = vector(-magnet.length/2, 0):rotated(magnet.rot)
+	local vecN = vector(-magnet.length/2, 0):rotated(magnet.rot * math.pi / 180)
 	edgeX[1].point = vector((vecN.x + magnet.pos_x) / self.grid_cell_width, (vecN.y + magnet.pos_y) / self.grid_cell_width)
-	print("north " .. edgeX[1].point.x .. " " .. edgeX[1].point.y)
 	edgeX[1].pole = -1
 	--The second Edge (south)
 	edgeX[2] = {}
 	local vecS = vector(magnet.length/2, 0):rotated(magnet.rot)
 	edgeX[2].point = vector((vecS.x + magnet.pos_x) / self.grid_cell_width, (vecS.y + magnet.pos_y) / self.grid_cell_width)
-	print("south " .. edgeX[2].point.x .. " " .. edgeX[2].point.y)
 	edgeX[2].pole = 1
 	return edgeX
 end
@@ -138,7 +142,9 @@ function Level:calcFieldStrengthAtPoint(fieldStrength, point, x, y)
     --distance
     local dist = math.sqrt((point.point.x-x)^2+(point.point.y-y)^2)
     --strength
-    return point.pole*fieldStrength/(dist^2)
+    --return point.pole*fieldStrength/(dist^2)
+    -- TODO
+    return point.pole*fieldStrength/dist
 end
 
 function Level:calcFieldDirection(point, x, y)
@@ -150,11 +156,14 @@ function Level:getFieldVector(x, y)
 	-- Bilinear interpolation between nearest sampled values
 	local floor_x = math.min(math.max(math.floor(x / self.grid_cell_width), 1), self.grid_width)
 	local ceil_x = math.min(math.max(math.ceil(x / self.grid_cell_width), 1), self.grid_width)
-	local floor_y = math.min(math.max(math.floor(y / self.grid_cell_width), 1), self.grid_width)
-	local ceil_y = math.min(math.max(math.ceil(y / self.grid_cell_width), 1), self.grid_width)
+	local floor_y = math.min(math.max(math.floor(y / self.grid_cell_width), 1), self.grid_height)
+	local ceil_y = math.min(math.max(math.ceil(y / self.grid_cell_width), 1), self.grid_height)
 	local fraction_x = x / self.grid_cell_width - floor_x
 	local fraction_y = y / self.grid_cell_width - floor_y
-	print("fraction_x: "..fraction_x)
+	if floor_x > ceil_x then
+		while true do
+		end
+	end
 	-- Clamp values into [1..0]
 	fraction_x = math.max(math.min(fraction_x, 1), 0)
 	fraction_y = math.max(math.min(fraction_y, 1), 0)
@@ -172,9 +181,11 @@ end
 function Level:draw(level_offset, scissor_top_left, scissor_size)
 	-- Draw magnets
 	for _,magnet in pairs(self.magnets) do
-		love.graphics.draw(magnet_img, magnet.pos_x - level_offset.x, magnet.pos_y - level_offset.y, rotation,
+		love.graphics.draw(magnet_img, magnet.pos_x - level_offset.x, magnet.pos_y - level_offset.y, magnet.rot / 180 * math.pi,
 			magnet.length / 200, magnet.width / 100, 100, 50)
+		magnet.shape:draw("fill") --TODO debug
 	end
+	self.finishline.finish:draw(self.finishline.x, self.finishline.finish.y)
 	-- Draw fields around the magnets
 	-- TODO
 end
@@ -211,7 +222,7 @@ function Level:drawFieldVector(level_offset, position)
 	--local grid_position = vec_floor(position / self.grid_cell_width + vector(0.9, 0.9))
 	-- Main arrow line
 	local field_strength = self.field_raster[position.x][position.y]
-	field_strength = field_strength / math.sqrt(field_strength:len())
+	field_strength = field_strength * 2
 	field_strength = field_strength * self.grid_cell_width
 	local arrow_end = arrow_start + field_strength
 	love.graphics.line(arrow_start.x, arrow_start.y, arrow_end.x, arrow_end.y)
