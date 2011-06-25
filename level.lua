@@ -182,9 +182,9 @@ function Level:draw(level_offset, scissor_top_left, scissor_size)
 	for _,magnet in pairs(self.magnets) do
 		love.graphics.draw(magnet_img, magnet.pos_x - level_offset.x, magnet.pos_y - level_offset.y, magnet.rot / 180 * math.pi,
 			magnet.length / 200, magnet.width / 100, 100, 50)
-		magnet.shape:draw("fill") --TODO debug
+		--magnet.shape:draw("fill") --TODO debug
 	end
-	self.finishline.finish:draw(self.end_x, self.end_y)
+	self.finishline.finish:draw(level_offset, self.end_x + scissor_top_left.x, self.end_y + scissor_top_left.x)
 	-- Draw fields around the magnets
 	-- TODO
 end

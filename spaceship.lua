@@ -32,7 +32,7 @@ local width = 200
 local height = 200
 local scale = 0.5
 
-function Spaceship:countdown( player, img_path, x, y, rotation )
+function Spaceship:countdown( player, img_path, x, y, rotation, level )
 --TODO startrichtung muss von level abhängig sein
 	self.startX = x
 	self.startY = y
@@ -44,6 +44,7 @@ function Spaceship:countdown( player, img_path, x, y, rotation )
 	self.height = 282
 	self.scale = 0.5
 	self:scaleSpaceshipPolygon()
+	self.level = level
 	-- newAnimation(plane_img, 200, 200, 0, 2)
 end
 
@@ -69,7 +70,7 @@ function Spaceship:draw(level_offset)
 		self.rotation / 180 * math.pi, self.scale, self.scale, 
 		self.width / 2, self.height / 2)
 	
-	self.hardonPolygon:draw("fill")
+	--self.hardonPolygon:draw("fill")
 
 	-- Debug: Forces
 	local right = Vector(10, 0):rotated(self.rotation / 180 * math.pi)
@@ -101,7 +102,6 @@ function Spaceship:calculatePosition(dt, level)
 	-- TODO: Calculate rotation
 	local acceleration = right_field_strength - left_field_strength
 	self.v = self.v + acceleration * dt * 1000 -- TODO: 100?
-	print(self.v.x, self.v.y)
 	-- Update position
 	self.x = self.x + self.v.x * dt
 	self.y = self.y + self.v.y * dt

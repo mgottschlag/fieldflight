@@ -42,9 +42,14 @@ function game:enter(previous, filename, multiplayer)
 	self.stars_far = love.graphics.newImage("graphics/stars1.png")
 	self.stars_near = love.graphics.newImage("graphics/stars2.png")
 	
+	-- Initialize timer
+	self.start_time = love.timer.getMicroTime()
+	
 	--initilize sound
 	TEsound.playLooping("sound/main.ogg", {"music"} , nil, 1)
 	--TODO tesound
+	
+	self.game_started = false
 	
 end
 
@@ -56,6 +61,14 @@ function game:leave()
 end
 
 function game:update(dt)
+	if self.game_started == false then
+		if love.timer.getMicroTime() - self.start_time > 3 then
+			self.game_started = true
+			self.start_time = love.timer.getMicroTime()
+		end
+		return
+	end
+	
 	dt = math.min(dt, tonumber(setting:getValue("framerate", tostring(1/30))))
 	--Let the players check the input devices
 	for i = 1, numberOfPlayers do
@@ -83,6 +96,12 @@ function game:update(dt)
 end
 
 function game:draw()
+	if self.game_started == false then
+		local elapsed = love.timer.getMicroTime() - self.start_time
+		love.graphics.print("Starting in "..3 - math.floor(elapsed).." s", 0, 0)
+		return
+	end
+
 	for i = 1, numberOfPlayers do
 		local player_position = Vector(self["player"..i].spaceship.x, self["player"..i].spaceship.y)
 		-- Calculate screen area
@@ -147,6 +166,7 @@ function game:draw()
 		end
 		love.graphics.setScissor()
 		-- Draw statistics (speed, time)
+		love.graphics.print("Time: "..love.timer.getMicroTime()-self.start_time.." s", 0, 0)
 		-- TODO
 	end
 	
