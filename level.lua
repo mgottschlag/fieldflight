@@ -164,8 +164,6 @@ function Level:getFieldVector(x, y)
 end
 
 function Level:draw(level_offset, scissor_top_left, scissor_size)
-	love.graphics.setScissor(scissor_top_left.x, scissor_top_left.y,
-		scissor_size.x, scissor_size.y)
 	-- Draw magnets
 	for _,magnet in pairs(self.magnets) do
 		love.graphics.draw(magnet_img, magnet.pos_x - level_offset.x, magnet.pos_y - level_offset.y, rotation,
@@ -173,7 +171,6 @@ function Level:draw(level_offset, scissor_top_left, scissor_size)
 	end
 	-- Draw fields around the magnets
 	-- TODO
-	love.graphics.setScissor()
 end
 
 function Level:drawFieldVectors(level_offset, scissor_top_left, scissor_size, position, radius)
@@ -182,9 +179,6 @@ function Level:drawFieldVectors(level_offset, scissor_top_left, scissor_size, po
 	--				89, 281,  92, 162,  85, 145,  68, 133,  89, 110,  97, 91,  98, 54,  95, 37,  80, 13) 	--right side
 	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.setLine(1, "smooth")
-	love.graphics.setScissor(scissor_top_left.x, scissor_top_left.y,
-		scissor_size.x, scissor_size.y)
-	love.graphics.line(scissor_top_left.x, scissor_top_left.y, scissor_size.x, scissor_size.y)
 	local circle_top_left = vec_ceil((position + Vector.new(-radius, -radius)) / self.grid_cell_width)
 	local circle_bottom_right = vec_floor((position + Vector.new(radius, radius)) / self.grid_cell_width)
 	-- Clamp drawing into field grid dimensions
@@ -192,6 +186,7 @@ function Level:drawFieldVectors(level_offset, scissor_top_left, scissor_size, po
 	circle_bottom_right.x = math.min(math.max(circle_bottom_right.x, 1), #self.field_raster)
 	circle_top_left.y = math.min(math.max(circle_top_left.y, 1), #self.field_raster[1])
 	circle_bottom_right.y = math.min(math.max(circle_bottom_right.y, 1), #self.field_raster[1])
+	--print("Box: "..circle_top_left.x.."/"..circle_top_left.y.." "..circle_bottom_right.x.."/"..circle_bottom_right.y)
 	-- Draw all field strength vectors within the circle
 	radius = radius / self.grid_cell_width
 	local circle_center = position / self.grid_cell_width
@@ -203,7 +198,6 @@ function Level:drawFieldVectors(level_offset, scissor_top_left, scissor_size, po
 			end
 		end
 	end
-	love.graphics.setScissor()
 end
 
 function Level:drawFieldVector(level_offset, position)

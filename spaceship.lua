@@ -51,9 +51,9 @@ function Spaceship:update(dt)
 	self:calculatePosition(dt)
 end
 
-function Spaceship:draw()
+function Spaceship:draw(level_offset)
 	-- love.graphics.draw( drawable, x, y, orientation, scaleX, scaleY, originX, originY )
-	self.spaceship_animation:draw(self.x, self.y,
+	self.spaceship_animation:draw(self.x - level_offset.x, self.y - level_offset.y,
 		self.rotation / 180 * math.pi, self.scale, self.scale, 
 		self.width / 2, self.height / 2)
 end
@@ -74,7 +74,7 @@ function Spaceship:rotate(degree)
 end
 
 function Spaceship:getSpeed()
-	return self.v.len()
+	return self.v:len()
 end
 
 function Spaceship:getXPos()
@@ -108,4 +108,24 @@ function Spaceship:rotateSpaceshipPolygon()
   		self.spaceship_polygon[i+1]	= (math.sin(rot_in_deg)*self.spaceship_polygon[i]) 
   			+ (   math.cos(rot_in_deg)*self.spaceship_polygon[i+1])
  	end
+end
+
+function Spaceship:restrictArea(min, max)
+	if self.x < min.x then
+		self.x = min.x
+		self.v.x = math.min(self.v.x, 0)
+		print("Reset: "..self.v.x)
+	end
+	if self.y < min.y then
+		self.y = min.y
+		self.v.y = math.min(self.v.y, 0)
+	end
+	if self.x > max.x then
+		self.x = max.x
+		self.v.x = math.max(self.v.x, 0)
+	end
+	if self.y > max.y then
+		self.y = max.y
+		self.v.y = math.max(self.v.y, 0)
+	end
 end

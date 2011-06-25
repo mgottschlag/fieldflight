@@ -16,8 +16,8 @@ function singleplayer_menu:init()
 	--singleplayer_menu_gui_elements["colorPickHeader"]:setPos(50,0)
 	
 	--Colorpick
-	singleplayer_menu_gui_elements["colorPick"] = goo.colorpick:new()
-	singleplayer_menu_gui_elements["colorPick"]:setPos(50,50)
+	--singleplayer_menu_gui_elements["colorPick"] = goo.colorpick:new()
+	--singleplayer_menu_gui_elements["colorPick"]:setPos(50,50)
 	
 	--button back
 	singleplayer_menu_gui_elements["button_back"] = goo.button:new()

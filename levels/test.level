@@ -1,8 +1,16 @@
 level_width 2000
 level_height 10000
-grid_cell_width 10
-box_width 10
+grid_cell_width 20
+box_width 20
 start 0 0
 end 1900 9900
-magnet 150 150 0 50 20 1
+magnet 150 150 0 100 20 1
+magnet 150 170 0 100 20 1
+magnet 150 190 0 100 20 1
+magnet 150 210 0 100 20 1
+
+magnet 350 150 0 100 20 1
+magnet 350 170 0 100 20 1
+magnet 350 190 0 100 20 1
+magnet 350 210 0 100 20 1
 

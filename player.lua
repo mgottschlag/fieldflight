@@ -4,21 +4,20 @@ require "settings"
 require "spaceship"
 
 Player = Class(function(self)
-self.name = "I am a player!"
-self.spaceship = Spaceship()
-self.spaceshipImagePath = ""
-self.colorRed = 0
-self.colorGreen = 0
-self.colorBlue = 0
-self.usesJoystickNumber = -1	-- -1=kein Joystick
-self.usesJoystickAxis = -1 	-- -1=Achsen werden nicht benutzt
-self.buttonLeft = "left"
-self.buttonRight = "right"
-self.buttonVollgas = "up"
-
+	self.name = "I am a player!"
+	self.spaceship = Spaceship()
+	self.spaceshipImagePath = ""
+	self.colorRed = 0
+	self.colorGreen = 0
+	self.colorBlue = 0
+	self.usesJoystickNumber = -1	-- -1=kein Joystick
+	self.usesJoystickAxis = -1 	-- -1=Achsen werden nicht benutzt
+	self.buttonLeft = "left"
+	self.buttonRight = "right"
+	self.buttonVollgas = "up"
 end)
 
-function Player:init(number, dt)
+function Player:init(number, dt, level)
 	self.name = setting:getValue("player"..number, "DummyName")
 	self.colorRed = setting:getValue("player"..number.."ColorRed", "0")
 	self.colorGreen = setting:getValue("player"..number.."ColorGreen", "0")
@@ -30,6 +29,9 @@ function Player:init(number, dt)
 	self.buttonLeft = setting:getValue("player"..number.."buttonLeft", "left")
 	self.buttonRight = setting:getValue("player"..number.."buttonRight", "right")
 	self.buttonUp = setting:getValue("player"..number.."buttonVollgas", "up")
+	-- Initialize arrow
+	self.arrow = Arrow()
+	self.arrow:init(self.spaceship, level)
 end
 
 function Player:checkInput(dt)
