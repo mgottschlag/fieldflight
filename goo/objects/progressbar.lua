@@ -11,6 +11,8 @@ function goo.progressbar:initialize( parent )
 	self:setRange()
 end
 function goo.progressbar:draw( x, y )
+	x = x or nil
+	y = y or nil
 	love.graphics.setColor( unpack(self.style.backgroundColor) )
 	love.graphics.rectangle( self.style.fillMode, x, y, self.w, self.h )
 end

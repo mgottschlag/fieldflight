@@ -5,6 +5,8 @@ function goo.text:initialize( parent )
 	self.text = "no text"
 end
 function goo.text:draw(x,y)
+	x = x or nil
+	y = y or nil
 	love.graphics.setColor( unpack(self.color) )
 	love.graphics.print( self.text, x, y )
 end
