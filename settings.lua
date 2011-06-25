@@ -12,7 +12,7 @@ Settings = Class(function(self)
 	self.path = ""
 end)
 
-function Settings:set(key, value)
+function Settings.set(key, value)
 	local set = {}
 	set.key = key
 	set.value = value
@@ -35,16 +35,16 @@ function Settings:loadSettings( pathIn )
 end 
 
 function Settings:insertNewPair(key, value)
-	table.insert(self.list, self.set(key, value))
+	table.insert(self.list, Settings.set(key, value))
 end
 
 function Settings:getValue( key, default )
-	for l in self.list do
+	for _,l in pairs(self.list) do
 		if l.key == key then
 			return l.value
 		end
 	end
-	self.insertNewPair(key, default)
+	self:insertNewPair(key, default)
 	return default
 end
 
