@@ -32,17 +32,43 @@ function settings_menu:initButtons()
 	menu_controls["accept"]:setSize(200, 40)
 	menu_controls["accept"]:setText("Accept")
 	menu_controls["accept"].onClick = function(self, button)
-		-- TODO: Save settings
+		
+		setting:setValue("player1ButtonLeft", links)
+		setting:setValue("player1ButtonRight", rechts)
+		setting:setValue("player1ButtonVollgas", up)
+		if love.joystick.getNumJoysticks() > 0 then
+			for i = 0, love.joystick.getNumJoysticks() do
+				if menu_controls["player1UsesJoystick"..i]:isChecked() then
+					setValue("player1UsesJoystickNumber", i)
+				end
+			end
+		end
+		
+		setting:setValue("player2ButtonLeft", links2)
+		setting:setValue("player2ButtonRight", rehts2)
+		setting:setValue("player2ButtonVollgas", up2)
+		if love.joystick.getNumJoysticks() > 0 then
+			for i = 0, love.joystick.getNumJoysticks() do
+				if menu_controls["player2UsesJoystick"..i]:isChecked() then
+					setValue("player2UsesJoystickNumber", i)
+				end
+			end
+		end
+		
 		Gamestate.switch(menu)
 	end
 	
-	--button select keys left
+	--text p1
+	menu_controls["p1Text"] = goo.text:new()
+	menu_controls["p1Text"]:setPos(500, 30)
+	menu_controls["p1Text"]:setText("Spieler1")
+	--button select keys acc
 	menu_controls["button_selectUp"] = goo.button:new()
-	menu_controls["button_selectUp"]:setPos(550, 100)
+	menu_controls["button_selectUp"]:setPos(550, 50)
 	menu_controls["button_selectUp"]:setSize(100, 50)
 	menu_controls["button_selectUp"]:setText("Acc")
 	menu_controls["button_selectUp"].onClick = function(self, button)
-		self.up = singleplayer_menu:selectButton()
+		self.up = settings_menu:selectButton()
 		if self.up == self.links then
 			self.links = nil
 			menu_controls["button_selectLeft"]:setText("Left")
@@ -57,11 +83,11 @@ function settings_menu:initButtons()
 	
 	--button select keys left
 	menu_controls["button_selectLeft"] = goo.button:new()
-	menu_controls["button_selectLeft"]:setPos(500, 150)
+	menu_controls["button_selectLeft"]:setPos(500, 100)
 	menu_controls["button_selectLeft"]:setSize(100, 50)
 	menu_controls["button_selectLeft"]:setText("Left")
 	menu_controls["button_selectLeft"].onClick = function(self, button)
-		self.links = singleplayer_menu:selectButton()
+		self.links = settings_menu:selectButton()
 		if self.links == self.up then
 			self.up = nil
 			menu_controls["button_selectUp"]:setText("Acc")
@@ -75,11 +101,11 @@ function settings_menu:initButtons()
 	
 	--button select keys right
 	menu_controls["button_selectRight"] = goo.button:new()
-	menu_controls["button_selectRight"]:setPos(600, 150)
+	menu_controls["button_selectRight"]:setPos(600, 100)
 	menu_controls["button_selectRight"]:setSize(100,50)
 	menu_controls["button_selectRight"]:setText("Right")
 	menu_controls["button_selectRight"].onClick = function(self, button)
-		self.rechts = singleplayer_menu:selectButton()
+		self.rechts = settings_menu:selectButton()
 		if self.rechts == self.links then
 			self.links = nil
 			menu_controls["button_selectLeft"]:setText("Left")
@@ -92,16 +118,87 @@ function settings_menu:initButtons()
 	end
 	
 	for i = 1, love.joystick.getNumJoysticks() do
+		menu_controls["p1UsesJoystick"..i] = goo.checkbox:new()
+		menu_controls["p1UsesJoystick"..i]:setPos(480,160)
 		menu_controls["useJoystickText"..i] = goo.text:new()
 		menu_controls["useJoystickText"..i]:setText(love.joystick.getName(i - 1))
-		menu_controls["useJoystickText"..i]:setPos(500, 250 + 50 * i)
+		menu_controls["useJoystickText"..i]:setPos(500, 160 + 50 * i)
 	end
+	
+	--text p2
+	menu_controls["p2Text"] = goo.text:new()
+	menu_controls["p2Text"]:setPos(500, 330)
+	menu_controls["p2Text"]:setText("Spieler2")
+	--button select keys acc
+	menu_controls["button_selectUp2"] = goo.button:new()
+	menu_controls["button_selectUp2"]:setPos(550, 350)
+	menu_controls["button_selectUp2"]:setSize(100, 50)
+	menu_controls["button_selectUp2"]:setText("Acc")
+	menu_controls["button_selectUp2"].onClick = function(self, button)
+		self.up2 = settings_menu:selectButton()
+		if self.up2 == self.links2 then
+			self.links2 = nil
+			menu_controls["button_selectLeft2"]:setText("Left")
+		end
+		if self.up2 == self.rechts2 then
+			self.rechts2 = nil
+			menu_controls["button_selectRight2"]:setText("Right")
+		end
+		menu_controls["button_selectUp2"]:setText("Acc\n"..self.up2)
+	end
+	
+	
+	--button select keys left
+	menu_controls["button_selectLeft2"] = goo.button:new()
+	menu_controls["button_selectLeft2"]:setPos(500, 400)
+	menu_controls["button_selectLeft2"]:setSize(100, 50)
+	menu_controls["button_selectLeft2"]:setText("Left")
+	menu_controls["button_selectLeft2"].onClick = function(self, button)
+		self.links2 = settings_menu:selectButton()
+		if self.links2 == self.up2 then
+			self.up2 = nil
+			menu_controls["button_selectUp2"]:setText("Acc")
+		end
+		if self.links2 == self.rechts2 then
+			self.rechts2 = nil
+			menu_controls["button_selectRight2"]:setText("Right")
+		end
+		menu_controls["button_selectLeft2"]:setText("Left\n"..self.links2)
+	end
+	
+	--button select keys right
+	menu_controls["button_selectRight2"] = goo.button:new()
+	menu_controls["button_selectRight2"]:setPos(600, 400)
+	menu_controls["button_selectRight2"]:setSize(100,50)
+	menu_controls["button_selectRight2"]:setText("Right")
+	menu_controls["button_selectRight2"].onClick = function(self, button)
+		self.rechts2 = settings_menu:selectButton()
+		if self.rechts2 == self.links2 then
+			self.links2 = nil
+			menu_controls["button_selectLeft"]:setText("Left")
+		end
+		if self.up2 == self.rechts2 then
+			self.up2 = nil
+			menu_controls["button_selectUp2"]:setText("Acc") 
+		end
+		menu_controls["button_selectRight2"]:setText("Right\n"..self.rechts2)
+	end
+	
+	for i = 1, love.joystick.getNumJoysticks() do
+		menu_controls["p2UsesJoystick"..i] = goo.checkbox:new()
+		menu_controls["p2UsesJoystick"..i]:setPos(480,460)
+		menu_controls["useJoystickText2"..i] = goo.text:new()
+		menu_controls["useJoystickText2"..i]:setText(love.joystick.getName(i - 1))
+		menu_controls["useJoystickText"..i]:setPos(500, 460 + 50 * i)
+	end
+	
+	
 	-- Volume progressbar
-	menu_controls["volume_progress"] = goo.progressbar:new()
-	menu_controls["volume_progress"]:setSize(progressbar_width, progressbar_height)
-	menu_controls["volume_progress"]:setPos( (screen_width/2)-(progressbar_width/2) , screen_height/2)
-	menu_controls["volume_progress"]:setRange(0, 100)
-	menu_controls["volume_progress"]:setProgress(50)
+	---menu_controls["volume_progress"] = goo.progressbar:new()
+	--menu_controls["volume_progress"]:setSize(progressbar_width, progressbar_height)
+	--menu_controls["volume_progress"]:setPos( (screen_width/2)-(progressbar_width/2) , screen_height/2)
+	--menu_controls["volume_progress"]:setRange(0, 100)
+	--menu_controls["volume_progress"]:setProgress(50)
 end
 
 function settings_menu:selectButton()

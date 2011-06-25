@@ -49,7 +49,7 @@ function Settings:getValue( key, default )
 end
 
 function Settings:setValue(key, value)
-	for l in self.list do
+	for _,l in pairs(self.list) do
 		if l.key == key then
 			l.value = value
 		end
@@ -60,7 +60,7 @@ end
 
 function Settings:saveSettings()
 	local data = ""
-	for l in self.list do
+	for _,l in pairs(self.list) do
 		data = data .. l.key .. "," .. l.value .. "\n"
 	end
 	return love.filesystem.write(self.path, data, 100000)
