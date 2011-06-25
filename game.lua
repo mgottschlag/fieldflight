@@ -163,6 +163,8 @@ end
 function on_collision(dt, a, b)
 	if a == game["player1"].spaceship.hardonPolygon or b == game["player1"].spaceship.hardonPolygon then
 		print("abc", a, b)
+	elseif game.level ~= nil and a == game.level.finishline.finish.shape or b == game.level.finishline.finish.shape then
+		print("target")		
 	end
 end
 

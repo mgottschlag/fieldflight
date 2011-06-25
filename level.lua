@@ -11,7 +11,12 @@ local magnet_img = love.graphics.newImage("graphics/Magnet-Test.png")
 
 
 Level = Class(function(self)
+	self.finishline = {}
+	self.finishline.finish = Finish()
+	self.finishline.finish:initialize()
 end)
+
+
 
 function Level:load(filename)
 	-- Open level file
@@ -43,9 +48,6 @@ function Level:load(filename)
 	
 	self:calcMagnetField()
 
-	self.finishline = {}
-	self.finishline.finish = Finish()
-	self.finishline.finish:initialize()
 	return false
 end
 
@@ -81,9 +83,6 @@ function Level:loadFromFile(filename)
 				self.end_x = tonumber(words[2])
 				self.end_y = tonumber(words[3])
 			end
-			elseif words[1] == "finishline" and #words == 3 then
-				self.finishline.x = tonumber(words[2])
-				self.finishline.y = tonumber(words[3])
 		end
 	end
 end
@@ -185,7 +184,7 @@ function Level:draw(level_offset, scissor_top_left, scissor_size)
 			magnet.length / 200, magnet.width / 100, 100, 50)
 		magnet.shape:draw("fill") --TODO debug
 	end
-	self.finishline.finish:draw(self.finishline.x, self.finishline.finish.y)
+	self.finishline.finish:draw(self.end_x, self.end_y)
 	-- Draw fields around the magnets
 	-- TODO
 end
