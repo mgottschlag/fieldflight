@@ -182,9 +182,10 @@ end
 
 function on_collision(dt, a, b)
 	if a == game["player1"].spaceship.hardonPolygon or b == game["player1"].spaceship.hardonPolygon then
-		print("abc", a, b)
+--		game["player1"].spaceship:backToTheRoots()	
+		game["player1"].spaceship:explode()
 	elseif game.level ~= nil and a == game.level.finishline.finish.shape or b == game.level.finishline.finish.shape then
-		print("target")		
+		Gamestate.switch(menu)			
 	end
 end
 

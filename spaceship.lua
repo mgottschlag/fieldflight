@@ -9,7 +9,7 @@ Spaceship = Class(function(self)
 	self.polarisation = 0
 	self.x = 0
 	self.y = 0
-	self.destroy = false
+	self.destroyed = false
 	self.startX = 0
 	self.startY = 0
 	self.spaceship_polygon = {	50, 1,			--top point
@@ -38,7 +38,7 @@ function Spaceship:countdown( player, img_path, x, y, rotation, level )
 	self.startX = x
 	self.startY = y
 	self.image = love.graphics.newImage(img_path)
-	self.spaceship_animation = newAnimation(self.image, 100, 282, 0, 3)
+	self.spaceship_animation = newAnimation(self.image, 100, 282, 0.05, 0)
 	self:backToTheRoots()
 	self.player = player
 	self.width = 100
@@ -49,9 +49,11 @@ function Spaceship:countdown( player, img_path, x, y, rotation, level )
 	-- newAnimation(plane_img, 200, 200, 0, 2)
 end
 
-function Spaceship:destroy()
-	self.spaceship_animation:seek(2)
-	self.destroy = true
+function Spaceship:explode()
+	--self.spaceship_animation:seek(2)
+	self.spaceship_animation:setMode("bounce")
+	self.spaceship_animation:play()
+	self.destroyed = true
 end
 
 local clock = os.clock
@@ -69,14 +71,20 @@ function Spaceship:backToTheRoots()
 	self:invertPolarisation(1)
 	self.hardonPolygon:setRotation(self.rotation / 180 * math.pi)
 	self.hardonPolygon:moveTo(self.x, self.y)
-	self.animation:seek(1)
+	self.spaceship_animation:seek(1)
+	self.spaceship_animation:stop()
 end
 
 function Spaceship:update(dt, level)
-	if self.destroy == true then
-		sleep(1)
-		self.destroy = false
+	if self.destroyed == true then
+		self.v = vector(0,0)
+		if self.spaceship_animation:getCurrentFrame() == 8 then
+			self.destroyed = false
+			self:backToTheRoots()
+			sleep(1)
+		end
 	end
+	self.spaceship_animation:update(dt)
 	self:calculatePosition(dt, level)
 end
 

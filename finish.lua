@@ -6,7 +6,7 @@ Hardon = require "hardoncollider"
 Finish = Class(function(self)
 	self.hit = 0 
 	self.img = love.graphics.newImage("graphics/target.png") 
-	self.animation = newAnimation(self.img,283, 346, 0, 2)
+	self.animation = newAnimation(self.img,141, 173, 0, 2)
 	self.shape = HC.addCircle(100, 100, 50)
 end)
 
